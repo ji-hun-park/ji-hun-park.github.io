@@ -34,9 +34,9 @@ enable_copy_code_button  : # true, false (default)
 copyright                : # "copyright" name, defaults to site.title
 copyright_url            : # "copyright" URL, defaults to site.url
 comments:
-  provider               : # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
+  provider               : "disqus"
   disqus:
-    shortname            : # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-
+    shortname            : https-ji-hun-park-github-io.disqus.com
   discourse:
     server               : # https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963 , e.g.: meta.discourse.org
   facebook:
@@ -121,7 +121,7 @@ author:
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:pgh979@gmail.com"
+      url: "mailto:pgh979@gmail.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
@@ -133,10 +133,10 @@ author:
       # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url: "https://github.com/ji-hun-park"
+      url: "https://github.com/ji-hun-park"
     - label: "LinkedIn"
       icon: # none
-      # url: "https://www.linkedin.com/in/%EC%A7%80%ED%9B%88-%EB%B0%95-62424828a/"
+      url: "https://www.linkedin.com/in/%EC%A7%80%ED%9B%88-%EB%B0%95-62424828a/"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       # url: "https://instagram.com/"
@@ -152,10 +152,10 @@ footer:
       # url:
     - label: "LinkedIn"
       icon: # none
-      # url: "https://www.linkedin.com/in/%EC%A7%80%ED%9B%88-%EB%B0%95-62424828a/"
+      url: "https://www.linkedin.com/in/%EC%A7%80%ED%9B%88-%EB%B0%95-62424828a/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url: "https://github.com/ji-hun-park"
+      url: "https://github.com/ji-hun-park"
     - label: "GitLab"
       icon: "fab fa-fw fa-gitlab"
       # url:
@@ -326,7 +326,7 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: # true
+      comments: true
       share: true
       related: true
 
