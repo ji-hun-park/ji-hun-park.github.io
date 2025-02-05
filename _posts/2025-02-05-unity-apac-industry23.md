@@ -152,7 +152,7 @@ AI는 최근에 갑자기 생겨난 것이 아닌 오래전부터 인류에 의�
 씨샵 코드를 생성해 복붙하거나 오브젝트도 자동 생성하고 서로 충돌시키거나 복제하는 등 문제를 해결해 나가면서 맵을 구성하는 모습을 보여주었다.
 
 ## Fifth Part
-### Track 2의 다섯 번째 파트
+### Track 2의 다섯번째 파트
 ![유니티 행사 이미지27](https://ji-hun-park.github.io/assets/images/UAI27.jpg "유니티 행사 이미지27"){: .align-center}
 ![유니티 행사 이미지28](https://ji-hun-park.github.io/assets/images/UAI28.jpg "유니티 행사 이미지28"){: .align-center}
 ![유니티 행사 이미지29](https://ji-hun-park.github.io/assets/images/UAI29.jpg "유니티 행사 이미지29"){: .align-center}
