@@ -22,7 +22,7 @@ last_modified_at: 2025-02-05T19:20:00-24:00
 ![유니티 행사 이미지07](https://ji-hun-park.github.io/assets/images/UAI07.jpg "유니티 행사 이미지07"){: .align-center}
 ![유니티 행사 이미지08](https://ji-hun-park.github.io/assets/images/UAI08.jpg "유니티 행사 이미지08"){: .align-center}
 위 사진들은 오프닝 관련 사진으로 본 행사에선 행사장을 4개의 트랙으로 나눠서 진행하였다.  
-
+### 본문
 오프닝은 3가지 세션(Track1~3)을 합쳐서 진행하였는데,  
 ![유니티 행사 이미지09](https://ji-hun-park.github.io/assets/images/UAI09.jpg "유니티 행사 이미지09"){: .align-center}
 ```
@@ -102,7 +102,7 @@ Track 3의 경우 Simulate, Optimize & Automate – Predict & Simulate를 다루
 ![유니티 행사 이미지16](https://ji-hun-park.github.io/assets/images/UAI16.jpg "유니티 행사 이미지16"){: .align-center}
 ![유니티 행사 이미지17](https://ji-hun-park.github.io/assets/images/UAI17.jpg "유니티 행사 이미지17"){: .align-center}
 ![유니티 행사 이미지18](https://ji-hun-park.github.io/assets/images/UAI18.jpg "유니티 행사 이미지18"){: .align-center}
-
+### 본문
 D:MOA 소속 Principal Developer이자, Digital Transformation Team 소속인 이길융 님의 `PiXYZ`를 이용한 산업현장 적용 사례 강연이다.  
 Unity의 `PiXYZ Plugin`을 통해 기존처럼 별도로 3D 데이터 준비 툴인 `Pixyz Studio`에서 작업해 가져올 필요 없이 직접 유니티에서 3D모델링 작업이 가능해지는데 이를 산업 분야에 적용한 예시를 보여주셨다.  
 직접 캐드 파일을 가져와 작업이 가능하고 바로 저장소에 올리면 된다.  
@@ -116,7 +116,7 @@ Unity의 `PiXYZ Plugin`을 통해 기존처럼 별도로 3D 데이터 준비 툴
 ![유니티 행사 이미지21](https://ji-hun-park.github.io/assets/images/UAI21.jpg "유니티 행사 이미지21"){: .align-center}
 ![유니티 행사 이미지22](https://ji-hun-park.github.io/assets/images/UAI22.jpg "유니티 행사 이미지22"){: .align-center}
 ![유니티 행사 이미지23](https://ji-hun-park.github.io/assets/images/UAI23.jpg "유니티 행사 이미지23"){: .align-center}
-
+### 본문
 다시 나오신 유니티 AI 리서치 리렉터 니코 페로니의 Unity AI 최신 기술 소개 및 인더스트리 적용 사례 탐구로 AI의 역사와 유니티 AI 기술 소개가 있었다.  
 AI는 최근에 갑자기 생겨난 것이 아닌 오래전부터 인류에 의해 개발돼 온 기술이며, 컴퓨터가 발전함에 따라 그 힘이 점점 증가했고, 2015년을 기점으로 폭발하였다.  
 이후 구글 딥마인드의 아버지 데미스 하사비스와 AI의 아버지 마빈 민스키의 대한 이야기들을 하면서 AI 발전의 역사를 설명하였다.
@@ -137,7 +137,7 @@ AI는 최근에 갑자기 생겨난 것이 아닌 오래전부터 인류에 의�
 ![유니티 행사 이미지24](https://ji-hun-park.github.io/assets/images/UAI24.jpg "유니티 행사 이미지24"){: .align-center}
 ![유니티 행사 이미지25](https://ji-hun-park.github.io/assets/images/UAI25.jpg "유니티 행사 이미지25"){: .align-center}
 ![유니티 행사 이미지26](https://ji-hun-park.github.io/assets/images/UAI26.jpg "유니티 행사 이미지26"){: .align-center}
-
+### 본문
 기존 10분이 아닌 20분의 약간 긴 브레이크 타임 이후 니코 패로니에 이어 같은 유니티 소속의 Technical Product Manager 마티나 조한네슨이 AI 관련 이야기를 좀 더 보강하면서 Unity AI가 산업에 미치는 영향 강의를 통해 이야기를 이어나갔다.
 
 첫 사진은 오프닝 때도 보여줬고, 니코도 보여줬지만 중요한 내용이라 다시 한번 강조했다.  
@@ -157,7 +157,7 @@ AI는 최근에 갑자기 생겨난 것이 아닌 오래전부터 인류에 의�
 ![유니티 행사 이미지28](https://ji-hun-park.github.io/assets/images/UAI28.jpg "유니티 행사 이미지28"){: .align-center}
 ![유니티 행사 이미지29](https://ji-hun-park.github.io/assets/images/UAI29.jpg "유니티 행사 이미지29"){: .align-center}
 ![유니티 행사 이미지30](https://ji-hun-park.github.io/assets/images/UAI30.jpg "유니티 행사 이미지30"){: .align-center}
-
+### 본문
 HECAWARE의 Innovation Lab 출신 Senior Vice President & Head인 Immanuel Kingsley의 Unity와 AI를 적용한 IT 서비스 업계의 `디지털 트윈`이다.  
 이 파트에선 트랙2의 앞에서 강연한 주제들에 이어서 경험과 지능의 융합에 관한 이야기를 하면서 완벽한 조화에 관해 설명하였다.
 
@@ -175,7 +175,7 @@ HECAWARE의 Innovation Lab 출신 Senior Vice President & Head인 Immanuel Kings
 ![유니티 행사 이미지36](https://ji-hun-park.github.io/assets/images/UAI36.jpg "유니티 행사 이미지36"){: .align-center}
 ![유니티 행사 이미지37](https://ji-hun-park.github.io/assets/images/UAI37.jpg "유니티 행사 이미지37"){: .align-center}
 ![유니티 행사 이미지38](https://ji-hun-park.github.io/assets/images/UAI38.jpg "유니티 행사 이미지38"){: .align-center}
-
+### 본문
 유니티 Senior Solutions Engineer 전영재 님의 `임베디드` 환경에서의 보다 개선된 사용자 경험을 위한 유니티 `워크 플로우` 강연에선 `HMI`를 통해 자동차 등 `임베디드` 환경에서 유니티를 통해 더 쉽게 프로그래밍하고, 추후 3단계 `자율주행`이 발전하면 자동차 게임 플랫폼이 생길 거란 이야기를 하였다.  
 유니티와 협력 계약한 자동차 업체의 차 모델을 통해 가상 환경에서 차의 모델링을 바꾸어 좀 더 쉽게 차량 홍보를 할 수 있고 자신이 있는 장소에 그 차가 실제로 있는 것처럼 보여줄 수도 있었다.
 
