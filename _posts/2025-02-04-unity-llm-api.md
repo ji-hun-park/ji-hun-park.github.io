@@ -5,7 +5,7 @@ toc_label: "주요 목차"
 categories:
   - Unity
 tags:
-  - Unity
+  - Unity, LLM, API, Gemini
 last_modified_at: 2025-02-04T11:16:00-20:00
 ---
 
