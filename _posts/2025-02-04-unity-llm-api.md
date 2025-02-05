@@ -3,9 +3,9 @@ title:  "Unity에 Gemini API를 활용해보며 얻은 것"
 excerpt: "Unity에서 LLM API를 적용하기위해 고생하면서 든 생각들"
 toc_label: "주요 목차"
 categories:
-  - Blog
+  - Unity
 tags:
-  - Blog
+  - Unity
 last_modified_at: 2025-02-04T11:16:00-20:00
 ---
 
