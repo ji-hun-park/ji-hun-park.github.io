@@ -1,7 +1,7 @@
 ---
 title:  "Unity에 Gemini API를 활용해보며 얻은 것"
 excerpt: "Unity에서 LLM API를 적용하기위해 고생하면서 든 생각들"
-toc_label: "페이지 주요 목차"
+toc_label: "주요 목차"
 categories:
   - Blog
 tags:
@@ -18,7 +18,7 @@ last_modified_at: 2025-02-04T11:16:00-20:00
 에세이 한 편이라 생각하시고 읽어주시면 감사하겠습니다.
 ### 설명
 ![미니게임 예시](https://ji-hun-park.github.io/assets/images/unity-ai-quiz.png "미니게임 예시"){: .align-center}
-위의 사진은 제가 종설(캡스톤)에서 제작중인 과제 프로그램의 실행 중 화면입니다.  
+위의 사진은 제가 대학교 종합설계(캡스톤)에서 제작한 과제 프로그램의 실행 중 화면입니다.  
 이번에 진행했던 과제는 다양한 CS 지식이 필요한 프로젝트였습니다.  
 평소 알고 있던 다양한 분야의 얕은 지식들을 바탕으로 문제를 단계적으로 해결할 수 있었습니다.
 
