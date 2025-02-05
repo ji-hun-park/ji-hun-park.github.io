@@ -13,18 +13,18 @@ last_modified_at: 2025-02-05T19:20:00-24:00
 
 ## Opening
 ### 소개
-![유니티 행사 이미지01](https://ji-hun-park.github.io/assets/images/UAI01.png "유니티 행사 이미지01"){: .align-center}
-![유니티 행사 이미지02](https://ji-hun-park.github.io/assets/images/UAI02.png "유니티 행사 이미지02"){: .align-center}
-![유니티 행사 이미지03](https://ji-hun-park.github.io/assets/images/UAI03.png "유니티 행사 이미지03"){: .align-center}
-![유니티 행사 이미지04](https://ji-hun-park.github.io/assets/images/UAI04.png "유니티 행사 이미지04"){: .align-center}
-![유니티 행사 이미지05](https://ji-hun-park.github.io/assets/images/UAI05.png "유니티 행사 이미지05"){: .align-center}
-![유니티 행사 이미지06](https://ji-hun-park.github.io/assets/images/UAI06.png "유니티 행사 이미지06"){: .align-center}
-![유니티 행사 이미지07](https://ji-hun-park.github.io/assets/images/UAI07.png "유니티 행사 이미지07"){: .align-center}
-![유니티 행사 이미지08](https://ji-hun-park.github.io/assets/images/UAI08.png "유니티 행사 이미지08"){: .align-center}
+![유니티 행사 이미지01](https://ji-hun-park.github.io/assets/images/UAI01.jpg "유니티 행사 이미지01"){: .align-center}
+![유니티 행사 이미지02](https://ji-hun-park.github.io/assets/images/UAI02.jpg "유니티 행사 이미지02"){: .align-center}
+![유니티 행사 이미지03](https://ji-hun-park.github.io/assets/images/UAI03.jpg "유니티 행사 이미지03"){: .align-center}
+![유니티 행사 이미지04](https://ji-hun-park.github.io/assets/images/UAI04.jpg "유니티 행사 이미지04"){: .align-center}
+![유니티 행사 이미지05](https://ji-hun-park.github.io/assets/images/UAI05.jpg "유니티 행사 이미지05"){: .align-center}
+![유니티 행사 이미지06](https://ji-hun-park.github.io/assets/images/UAI06.jpg "유니티 행사 이미지06"){: .align-center}
+![유니티 행사 이미지07](https://ji-hun-park.github.io/assets/images/UAI07.jpg "유니티 행사 이미지07"){: .align-center}
+![유니티 행사 이미지08](https://ji-hun-park.github.io/assets/images/UAI08.jpg "유니티 행사 이미지08"){: .align-center}
 위 사진들은 오프닝 관련 사진으로 본 행사에선 행사장을 4개의 트랙으로 나눠서 진행하였다.  
 
 오프닝은 3가지 세션(Track1~3)을 합쳐서 진행하였는데,  
-![유니티 행사 이미지09](https://ji-hun-park.github.io/assets/images/UAI09.png "유니티 행사 이미지09"){: .align-center}
+![유니티 행사 이미지09](https://ji-hun-park.github.io/assets/images/UAI09.jpg "유니티 행사 이미지09"){: .align-center}
 ```
 VP, 유니티 인더스트리, 딜리버리 스튜디로의 글로벌 헤드인 로리 암즈의 디지털 트윈의 현재와 유니티가 그리는 미래 비젼  
 AI 리서치, 유니티의 디렉터인 니코 페로니의 AI가 산업과 디지털 트윈에 미치는 영향과 그 의미  
