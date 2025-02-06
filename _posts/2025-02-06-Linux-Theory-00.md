@@ -113,7 +113,7 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 `AT&T`는 즉시 `Unix System V`를 상용화(상업화)하기 위해 서둘렀습니다.  
 `Thompson`과 `Ritchie`는 일반 `운영 체제 이론`을 개발하고 특히 `UNIX 운영 체제`를 구현한 공로로 `Turing Award, 튜링상`을 공동 수상했습니다.
 
-### 1984-1987
+### 1984 - 1987
 ![그림08](https://ji-hun-park.github.io/assets/images/그림09.jpg "그림08"){: .align-center}
 
 #### 1984
