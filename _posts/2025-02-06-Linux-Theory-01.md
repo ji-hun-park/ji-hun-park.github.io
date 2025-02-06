@@ -134,6 +134,7 @@ l	: symbolic link (바로가기와 비슷하다)
 b	: block special file  
 c	: character special file  
 p	: FIFO  
+s   : socket file  
 -       : regular file
 ```
 
@@ -151,6 +152,11 @@ p	: FIFO
 ## Process
 ### Process
 프로세스란 실행 중인 프로그램의 인스턴스입니다.  
+프로그램을 실행시키면 프로세스가 만들어지고, 프로그램을 다룹니다.  
+그냥 텍스트(문자) 자체로 Disk(보조 기억 장치)에 잠들어 있으면 프로그램,  
+실행돼서 RAM(주 기억 장치) 등에 올라가면 프로세스라고 생각하시면 됩니다.  
+프로세스는 한 프로그램에 여러 개가 있을 수 있습니다.
+
 다음은 정보를 볼 수 있는 명령어들 입니다.  
 >$ ls [파일들의 리스트 열거]  
 >$ ps [프로세스들의 정보 리스트를 봄(자신이 만든 프로세서만)]
@@ -159,10 +165,50 @@ p	: FIFO
     + -(옵션) a가 붙으면 .으로 시작하는 히든 파일들도 나타납니다.
     - l은 Long입니다.(상세히 보기)
     * 맨 앞에 나오는 문자 하나가 파일의 타입을 나타냅니다. [파일 타입 보기](https://ji-hun-park.github.io/linux/Linux-Theory-01/#-ls-al%EB%A1%9C-%EB%B3%BC-%EC%88%98-%EC%9E%88%EB%8A%94-%ED%8C%8C%EC%9D%BC-%ED%83%80%EC%9E%85-%EB%AA%A9%EB%A1%9D%EB%A7%A8-%EC%95%9E)
+* $ ps –ef (다른 사람들이 만든 프로세스도 볼 수 있습니다.)
 
 ### Inter-process communication (IPC)
++ Pipe (프로세스 간 연결 통로)
++ FIFO (Pipe의 일종)
++ Signals (각종 신호들)
++ Shared memory (공유 자원)
++ Semaphore (Synchronization을 위한 툴)
++ Sockets (Network(TCP/IP)를 통해 프로세스 간 원격 통신, 협력(cooperating) 연결점)
 
-## 작성중
+## System calls and Library subroutines
+### System call
+* 소프트웨어 개발자의 UNIX 커널로의 여권입니다.
+* 프로그래머는 일반적인 C 서브루틴이나 함수를 호출합니다.
+* 커널 내부에서 수행되는 실제 작업입니다.
+
+```c
+nread = fread(inputbuf, OBJSIZE, numberobjs, fileptr);
+nread = read(filedes, inputbuf, BUFSIZE);
+```
+
+![그림03](https://ji-hun-park.github.io/assets/images/그림21.jpg "그림03"){: .align-center}
+![그림04](https://ji-hun-park.github.io/assets/images/그림22.jpg "그림04"){: .align-center}
+
+개발자가 커넬의 인터페이스를 부릅니다.(패스포트, API)  
+C 서브로틴이나 펑션을 부를 때처럼 부릅니다.(살짝 다름)  
+유저 공간(유저모드)에서 프로그램 코드로 read 유저코드를 부르다가 Kernel space(OS모드)에서 read 커널코드로 바뀝니다.  
+fread 라이브러리(시스템 콜 아님)에서 read를 부릅니다.(fread랑 read는 별 차이 없습니다.)
+
+### System call involves two context switches(from user to kernel and back)
+유저 모드에서 커널 모드로 바뀌는 것(Trap)은 소프트웨어 Interrupt 방식입니다.  
+이때 유저모드는 잠깐 멈춥니다.  
+시스템 콜은 헤비합니다.(유저 모드와 커널 모드를 오가면서(사용자에서 커널로, 그리고 다시 사용자로) 두 번의 컨텍스트 스위치스(문맥 전환)가 일어남, Heavy Job)  
+프로세스에 자신의 주소 공간을 쓰지 않기 때문에 프로세스 자체 주소 공간 내에서 간단한 함수를 호출하는 것보다 훨씬 더 오래 걸립니다.  
+과도하게 시스템 콜을 쓰면 시스템에 과부하가 걸리니 피하는 것이 좋습니다.
+
+### Every system call is defined in a header file.
+모든 시스템 호출(시스템 콜)은 헤더 파일에 정의되어 있습니다.  
+호출하기 전에 올바른 헤더를 포함했는지 확인해야 합니다.
+
+### Tip!
+```
+실제로 필요하지 않은 헤더를 포함하는 데는 아무런 해가 없으므로 가장 일반적인 헤더를 마스터 헤더에 수집하여 포함하는 것이 가장 쉽습니다.
+```
 
 ## 마무리
 이상으로 Linux의 기초편을 마치겠습니다.  
