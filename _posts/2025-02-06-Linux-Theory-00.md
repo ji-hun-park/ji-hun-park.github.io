@@ -177,13 +177,29 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 [UNIX](https://www.unix.org/)
 >Compliance
 >>AIX, HP/UX, Mac OS X, SCO, Solaris, Tru64 UNIX, z/OS …
+>>>AIX(IBM UNIX), HP/UX(Hewlett Packard Enterprise), Mac OS X(Mach), Solaris(사라짐)
 
 `오스틴 그룹`에서 `Single UNIX Specification Version3` 출시(현재는 4)  
 * The Open Group Base Specifications Issue 6
 * IEEE Std 1003.1-2001(POSIX.1, 유닉스 표준안)
 * ISO/IEC 9945:2002(동일한 문서입니다!)
 
+### 2008
 ![그림13](https://ji-hun-park.github.io/assets/images/그림14.jpg "그림13"){: .align-center}
+
+## Evolution of Unix and Unix-like systems
 ![그림14](https://ji-hun-park.github.io/assets/images/그림15.jpg "그림14"){: .align-center}
+
+## Major Types of Unix
+
+## Assignment
+
+## Virtual System
+
+## UNIX Standard
+
+## Symbols For Standard Programming
+
+## What standard does your system support?
 
 ## 작성중
