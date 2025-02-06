@@ -34,7 +34,7 @@ last_modified_at: 2025-02-06T18:05:00-00:00
 ### 1962
 MIT의 계산 센터는 `CTSS(호환 타임셰어링 시스템)`라는 최초의 `타임셰어링 운영 체제`를 개발했습니다.  
 CTSS는 후속작 `MULTICS(MULTiplexed Information and Computing Service)` 개발에 영감을 주었습니다.  
-~~(그러나 후에 실패하게 됩니다.)~~
+그러나 후에 실패하게 됩니다.
 
 ## History
 ### 1969 - 1971
@@ -194,16 +194,145 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 
 ## Major Types of Unix
 ![그림15](https://ji-hun-park.github.io/assets/images/그림16.jpg "그림15"){: .align-center}
-`BSD4.3`으로 `스티브 잡스`가 `넥스트스텝 오픈스텝`을 만들고 그걸 `애플`에 팔면서 `맥OS`가 만들어졌습니다.  
-그러나 `리눅스`는 `독자적(공짜)`입니다.
+>BSD4.3(오픈소스)로 스티브 잡스가 넥스트스텝, 오픈스텝을 만들고 그걸 애플에 팔면서 Mac OS가 만들어졌습니다.  
+>>그러나 리눅스는 독자적(공짜)입니다.
+
 ## Assignment
+### Install Freeware UNIX
+* Solaris
+  * ~~https://www.sunfreeware.com~~
+* BSD
+  * <https://www.freebsd.org/>
+  * <https://www.openbsd.org/>
+  * <https://www.netbsd.org>
+* Linux
+  * <https://distrowatch.com/>  : Linux-ranking site
+  * <https://cygwin.com>
+  * <https://www.ubuntu.com/>
+  * <https://fedoraproject.org/>
+  * <https://www.opensuse.org/>
 
-## Virtual System
+### Virtual System
+Commercial Software
+<https://vmware.com/>
 
-## UNIX Standard
+Open Source Software 
+<https://www.virtualbox.org/>
+
+## Appendix
+### Standard Issue
+
+### UNIX Standard
 ![그림16](https://ji-hun-park.github.io/assets/images/그림17.jpg "그림16"){: .align-center}
-## Symbols For Standard Programming
+### Symbols For Standard Programming
 ![그림17](https://ji-hun-park.github.io/assets/images/그림18.jpg "그림17"){: .align-center}
-## What standard does your system support?
+#### \_SUVREQ_H\_
+```c
+#ifndef _SUVREQ_H_
+#define _SUVREQ_H_
 
-## 작성중
+#ifdef _POSIX_SOURCE /* tmp */
+#error
+#endif
+
+#if defined(SUV_POSIX1990)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 1
+
+#elif defined(SUV_POSIX1993)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 199309L
+
+#elif defined(SUV_POSIX1996)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 199506L
+
+#elif defined(SUV_SUS1)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 2
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED 1
+
+#elif defined(SUV_SUS2)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 199506L
+#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE_EXTENDED 1
+
+#elif defined(SUV_SUS3)
+#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#define _XOPEN_SOURCE 600
+#define _XOPEN_SOURCE_EXTENDED 1
+#endif
+
+#endif /* _SUVREQ_H_ */
+```
+### What standard does your system support?
+표준에 따라 애플리케이션을 작성하기 전에 OS에서 제공하는 내용을 확인해야 합니다.  
+UNIX는 이를 위해 `unistd.h`에 포함된 일부 심볼을 ​​제공합니다.
+- _POSIX_VERSION :
+- _XOPEN_UNIX :
+- _XOPEN_VERSION :3(XPG3), 4(SUSV1)
+
+#### SUV_SUS3
+```c
+#define SUV_SUS3
+
+#if 1
+#include "suvreq.h"
+#endif
+#include <unistd.h>
+#include <stdio.h>
+
+int main(void){
+  printf("Request:\n");
+
+  #ifdef _POSIX_SOURCE
+    printf("\t_POSIX_SOURCE defined\n");
+    printf("\t_POSIX_C_SOURCE = %ld\n", (long)_POSIX_C_SOURCE);
+  #else
+    printf("\t_POSIX_SOURCE undefined\n");
+  #endif
+
+  #ifdef _XOPEN_SOURCE
+    #if _XOPEN_SOURCE == 0
+      printf("\t_XOPEN_SOURCE defined (0 or no value)\n");
+    #else
+      printf("\t_XOPEN_SOURCE = %d\n", _XOPEN_SOURCE);
+    #endif
+  #else
+    printf("\t_XOPEN_SOURCE undefined\n");
+  #endif
+
+  #ifdef _XOPEN_SOURCE_EXTENDED
+    printf("\t_XOPEN_SOURCE_EXTENDED defined\n");
+  #else
+    printf("\t_XOPEN_SOURCE_EXTENDED undefined\n");
+  #endif
+
+  printf("Claims:\n");
+  #ifdef _POSIX_VERSION
+    printf("\t_POSIX_VERSION = %ld\n", (long)_POSIX_VERSION);
+  #else
+    printf("\tNot POSIX\n");
+  #endif
+
+  #ifdef _XOPEN_UNIX
+    printf("\tX/Open\n");
+    #ifdef _XOPEN_VERSION
+      printf("\t_XOPEN_VERSION = %d\n", _XOPEN_VERSION);
+    #else
+      printf("\tError: _XOPEN_UNIX defined, but not _XOPEN_VERSION\n");
+    #endif
+  #else
+    printf("\tNot X/Open\n");
+  #endif
+
+  return 0;
+}
+```
+
+## 마무리
+이상으로 Unix와 Linux의 역사편을 마치겠습니다.  
+긴 글 읽어주셔서 감사합니다!
