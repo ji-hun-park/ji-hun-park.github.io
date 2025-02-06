@@ -5,7 +5,10 @@ toc_label: "목차"
 categories:
   - Linux
 tags:
-  - Linux, Lecture, Theory, Practice
+  - Linux
+  - Lecture
+  - Theory
+  - Practice
 last_modified_at: 2025-02-06T16:10:00-00:00
 ---
 

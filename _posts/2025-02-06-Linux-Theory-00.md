@@ -5,8 +5,10 @@ toc_label: "목차"
 categories:
   - Linux
 tags:
-  - Linux, Lecture, Theory
-last_modified_at: 2025-02-06T18:05:00-00:00
+  - Linux
+  - Lecture
+  - Theory
+last_modified_at: 2025-02-06T18:15:00-23:00
 ---
 
 # Linux Lecture Theory 00 History
