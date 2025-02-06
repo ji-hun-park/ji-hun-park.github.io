@@ -10,12 +10,14 @@ last_modified_at: 2025-02-06T18:05:00-00:00
 ---
 
 # Linux Lecture Theory 00 History
+
 ## Intro
 유닉스와 리눅스의 발전 과정에 대해 알아보겠습니다.  
 이러한 역사를 안다면 현재 기술이 어떤 고민과 시행 착오를 통해 개선되어 왔는지 알 수 있으니  
 이해도가 높아지고, 추후 이를 응용할 때 방향성을 잡기도 용이할 것 입니다.
 
 ## Before UNIX
+
 ### 1955
 리눅스는 1970년대에 처음 등장했으며, 1955년에 `존 맥카시`가 타임 셰어링 개념의 기원이 되는 아이디어를 최초로 고안했습니다.  
 그의 아이디어는 CTSS 개발에 영향을 미쳤습니다.
@@ -94,6 +96,7 @@ UNIX 개발에서 분열
 
 #### 1980
 `Microsoft`가 `Xenix`라는 자체 버전의 `Unix`로 OS 사업에 진출했습니다.
+
 #### 1981
 `IBM`이 `Microsoft`에 새로운 PC 라인용 OS를 개발하는 계약을 제공했습니다.
 
@@ -110,6 +113,7 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 
 ### 1984-1987
 ![그림08](https://ji-hun-park.github.io/assets/images/그림09.jpg "그림08"){: .align-center}
+
 #### 1984
 유닉스 버전이 너무 많아져서 호환이 안되는 문제가 생겼습니다.  
 그래서 `X/Open 컨소시엄`을 설립해 표준화를 시도했습니다.  
@@ -141,7 +145,44 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 ![그림10](https://ji-hun-park.github.io/assets/images/그림11.jpg "그림10"){: .align-center}
 ![그림11](https://ji-hun-park.github.io/assets/images/그림12.jpg "그림11"){: .align-center}
 
+### 1993
+`UI(UNIX International)`와 `OSF(Open Software Foundation)`의 주요 참여자들이 `COSE(Common Open Software Environment)` 연합을 결성했습니다.  
+6월에 `AT&T`는 `UNIX` 자산을 `Novell(네트워크사)`에 매각했습니다.  
+거기에 그치지않고, `Novell`은 구매한 `UNIX®` 상표 및 인증 권한을 `X/Open Consortium`에 양도하기로 결정했습니다.  
+`Novell`은 이를 이용해 `Windows NT`와 싸우려고 했지만 핵심 시장은 상당한 타격을 입었습니다.  
+`마이크로 소프트`사는 `Windows NT`에 88년 `카네기 멜런` 대학교에서 만든 `Mach`라는 가볍고 효율적이고 퍼포먼스 좋은 커널을 채용했습니다.
+
+### 1994
+`UI`와 `OSF`가 합병되었고, 합병된 단체는 `OSF`라는 이름을 유지했습니다.  
+`X/Open`은 `System V`를 기반으로 `Spec1170`을 발표했습니다.
+
+### 1995
+기존 `UNIX 라이선스`를 관리하고 지원하는 사업과 `System V` 코드 기반을 추가로 개발할 수 있는 권한은 `Novell`이 `Santa Cruz Operation(SCO)`에 매각했습니다.
+
+### 1996
+`X/Open`과 새로운 `OSF`가 합병하여 `Open Group`을 형성했습니다.
+
+### 1997
+`Open Group`이 `Single UNIX Specification Version 2`를 출시했습니다.(최종)
+
+### 1998
+`Open Group`과 `IEEE`가 `Austin Group`을 시작했습니다.
+`Austin Group`이 `POSIX`와 `Single UNIX Specification`의 `통합 표준`을 개발하기 시작했습니다.
+
+### 2000
+`SCO(Santa Cruz Operation)`가 전체 `UNIX` 사업과 자산을 `Caldera Systems`에 매각했습니다.
+
+### 2001
 ![그림12](https://ji-hun-park.github.io/assets/images/그림13.jpg "그림12"){: .align-center}
+[UNIX](https://www.unix.org/)
+>Compliance
+>>AIX, HP/UX, Mac OS X, SCO, Solaris, Tru64 UNIX, z/OS …
+
+`오스틴 그룹`에서 `Single UNIX Specification Version3` 출시(현재는 4)  
+* The Open Group Base Specifications Issue 6
+* IEEE Std 1003.1-2001(POSIX.1, 유닉스 표준안)
+* ISO/IEC 9945:2002(동일한 문서입니다!)
+
 ![그림13](https://ji-hun-park.github.io/assets/images/그림14.jpg "그림13"){: .align-center}
 ![그림14](https://ji-hun-park.github.io/assets/images/그림15.jpg "그림14"){: .align-center}
 
