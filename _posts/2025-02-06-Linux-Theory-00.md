@@ -203,7 +203,7 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 ## UNIX Standard
 ![그림16](https://ji-hun-park.github.io/assets/images/그림17.jpg "그림16"){: .align-center}
 ## Symbols For Standard Programming
-
+![그림17](https://ji-hun-park.github.io/assets/images/그림18.jpg "그림17"){: .align-center}
 ## What standard does your system support?
 
 ## 작성중
