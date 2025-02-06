@@ -186,18 +186,22 @@ AT&T는 이제 상업적 사용을 위해 버전 7을 기반으로 한 UNIX Syst
 
 ### 2008
 ![그림13](https://ji-hun-park.github.io/assets/images/그림14.jpg "그림13"){: .align-center}
+2008년 12월, `오스틴 그룹`은 `POSIX:2008(공식적으로 IEEE Std 1003.1-2008)` 기반 새로운 주요 개정판인 `Single UNIX Specification, Version 4(SUSv4)`를 발표했습니다.  
 
 ## Evolution of Unix and Unix-like systems
 ![그림14](https://ji-hun-park.github.io/assets/images/그림15.jpg "그림14"){: .align-center}
+* UNIX 계열의 발전 과정도입니다!
 
 ## Major Types of Unix
-
+![그림15](https://ji-hun-park.github.io/assets/images/그림16.jpg "그림15"){: .align-center}
+`BSD4.3`으로 `스티브 잡스`가 `넥스트스텝 오픈스텝`을 만들고 그걸 `애플`에 팔면서 `맥OS`가 만들어졌습니다.  
+그러나 `리눅스`는 `독자적(공짜)`입니다.
 ## Assignment
 
 ## Virtual System
 
 ## UNIX Standard
-
+![그림16](https://ji-hun-park.github.io/assets/images/그림17.jpg "그림16"){: .align-center}
 ## Symbols For Standard Programming
 
 ## What standard does your system support?
