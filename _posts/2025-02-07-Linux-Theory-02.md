@@ -446,9 +446,183 @@ fd에 3이 들어가고, 이를 read에 인자로 주면 3번 파일에서 512by
 타일 테이블을 가리키는 디스크립터가 하나라는 제약은 없습니다.  
 카운트는 자신을 가리키는 포인터 수입니다.
 
+## The write(2) system call
+```c
+#include <unistd.h>
+
+ssize_t write(int filedes, const void *buffer, size_t n);
+
+//Returns: number of bytes written if OK, -1 on error
+```
+* 파일을 쓰면 메모리에서 현재 파일 위치로 바이트가 복사되고, 현재 파일 위치가 업데이트됩니다.  
+>Arguments(인자)
+>>filedes: 파일 설명자(open 또는 creat에서 얻음)  
+buffer: 쓸 데이터에 대한 포인터  
+n: 쓸 바이트 수
+
++ 프로그램이 기존 파일을 쓰기 위해 여는 경우
+    - 파일의 이전 데이터는 문자 단위로 새 파일에 의해 덮어쓰여집니다.  
++ open에서 O_APPEND 옵션이 지정된 경우 파일의 오프셋은 현재 파일 끝으로 설정됩니다.
+
+### 예제
+```c
+int copyfile ( const char *name1, const char *name2){
+    int infile, outfile;
+    ssize_t nread;
+    char buffer[BUFSIZE];	/* BUFSIZE : 512 */
+
+    if ( (infile = open (name1, O_RDONLY ) ) == -1)
+	return(-1);
+
+    /* FMODE : O_WRONLY｜O_CREAT｜O_TRUNC */
+    if ( (outfile = open (name2, FMODE, PERM) ) == -1){
+        close (infile);
+        return (-2);
+    }
+    
+    while ( (nread = read (infile, buffer, BUFSIZE) ) > 0){
+        if ( write(outfile, buffer, nread) < nread ){
+	   close (infile);
+	   close (outfile);
+	   return (-3); 		/* 쓰기 오류 */
+        }
+    }
+
+    close (infile);
+    close (outfile);
+
+    if ( nread == -1)  return (-4)	/* 마지막 읽기에서 오류 발생 */
+    else   return (0); 		        /* 만사가 잘 되었음*/
+}
+```
+`copfile(name1, name2는 문자열)` 네임1을 네임2로 copy(복사)합니다.
+
+`unistd 헤더`가 있어야하고, write 명령어로 매개변수로 fd, buffer, n을 주는건 read랑 같습니다.  
+리드에선 파일에서 읽어서 버퍼로 데이터를 집어 넣었으나, 라이트에선 버퍼 안에 메모리를, 버퍼가 가리키는 시작 위치에서 n바이트만큼 파일에다 집어 넣습니다.(리드와 반대)  
+`ssize_t`형 `nread`에는 실제로 라이트가 된 데이터의, 바이트의 수가 리턴됩니다.(실패하면 –1 리턴)  
+리드와 마찬가지로 현재 파일 위치가 n만큼 뒤로 이동합니다.
+
+프로그램을 오픈했을 때 이미 있는 파일이라면 overwrite(오버라이트, 덮어쓰기)합니다.(기존 내용에 덮어 씌우는데 뒤에 내용은 그대로 남습니다.)  
+`APPEND`로 오픈하면 파일 오프셋이 엔드 오브 파일(EOF)이라 맨 마지막부터 라이트합니다.
+
+`infile`, `outfile`은 fd(파일 서술자), `nread`는 실제로 리드한 사이즈입니다.  
+`buffer`는 메모리 버퍼, 최대 512바이트입니다.  
+name1을 오픈합니다.(실패하면 오류)  
+`FMODE`는 있으면 자르고(TRUNC, empty로 만듭니다.) 열고, 없으면 `PERM` 퍼미션을 주고 새로 만들어서 엽니다.(O_WRONLY｜O_CREAT｜O_TRUNC)  
+name2도 엽니다.(실패하면 인파일 닫고 오류)
+
+nread에 리드(인파일(네임1),버퍼에 버프사이즈만큼 넣습니다.) 넣고 이 값이 0보다 크면(뭔가를 읽었다면) 라이트(위에서 읽은 만큼 버퍼에 저장해서 아웃파일에 라이트), 이 값이 nread보다 작으면 오류, 크거나 같으면 과정을 반복합니다.  
+끝나면 둘 다 close합니다.
+
+다만 nread가 0이 아닌 –1에서 끝나는 경우가 있을 수 있습니다, 그 경우 오류가 발생합니다.  
+모든 작업이 무사히 종료되면 0을 반환(return)합니다.
+
+## read, write and efficiency
+### read, write and efficiency (1/3)
+```c
+copyfile(“test.in”, “test.out”);
+```
 ![그림07](https://ji-hun-park.github.io/assets/images/그림30.jpg "그림07"){: .align-center}
+오퍼레이팅 시스템(OS)은 프로세스가 하나만 도는 게 아닙니다.  
+
+- 리얼 타임은 모든 걸 실행한 시간  
+- 유저 타임은 실제 프로세스를 실행한 시간  
+- 시스템 타임은 OS가 실행한 시간
+
+- 버퍼 크기를 늘리면 성능이 향상됩니다.
+    - 가장 좋은 성능은 `BUFSIZE`가 시스템의 자연 디스크 차단 계수의 배수일 때 달성됩니다.
+    - 자연 디스크 블록: `stat`의 `st_blksize`
+- 시스템 호출 수 감소
+    - 시스템 호출이 이루어질 때 프로그램과 커널 간의 모드를 전환하는 것은 비교적 비쌀 수 있습니다.
+
+블록 사이즈는 I/O의 단위입니다.(4K가 퍼포먼스가 가장 좋음)  
+버퍼 사이즈를 증가 시키면 퍼포먼스가 좋아집니다.(다만 한계가 있음)  
+시스템 콜은 컨텍스트 스위칭(문맥 교환)도 발생하고 해서 Heavy해서 실행 횟수를 줄이는게 좋습니다.
+
+### read, write and efficiency (2/3)
+#### The write system call is too fast. Why?
+write 시스템 호출(system call)을 실행하면 쓰기를 수행한 다음 반환(return)하지 않습니다.  
+커널의 버퍼 캐시로 데이터를 전송한 다음 반환합니다. → delayed writing  
+(디스크의 경우 커널에 있는 버퍼 캐쉬를 거칩니다, 이 버퍼 캐쉬가 꽉 찰 때까지(4K바이트) 라이팅을 안 합니다.)  
+
+>그러나 디스크 오류가 발생하거나 커널이 어떤 이유로든 중단되면 게임 오버!  
+>>`썼던` 데이터가 디스크에 전혀 없다는 것을 알게 됩니다.
+
+### read, write and efficiency (3/3)
+#### System kernel block
 ![그림08](https://ji-hun-park.github.io/assets/images/그림31.jpg "그림08"){: .align-center}
+- 참고만 하기
+
+## The lseek(2) system call
+```c
+#include <unistd.h>
+/* the character l in the name lseek means “long integer” */
+off_t lseek(int filedes, off_t offset, int start_flag);
+
+//Returns: new file offset if OK, -1 on error
+```
+열려 있는 파일의 오프셋은 lseek를 호출하여 명시적으로 설정할 수 있습니다.  
+`파일 오프셋`은 일반 파일에서 다음 읽기(read) 또는 쓰기(write)가 발생할 위치를 표시하는 위치입니다.  
+- Arguments(인자들)
+    - filedes: file descriptor(파일 서술자, open, creat의 반환값으로 얻을 수 있음)
+        - 파이프, FIFO 또는 소켓을 참조하는 경우 errno(에러 넘버)를 ESPIPE(return -1)로 설정합니다.
+    - offset: start_flag로부터의 바이트 수
+    - start_flag: starting position(시작 위치)
+        - SEEK_SET #0
+        - SEEK_CUR #1
+        - SEEK_END #2
+
 ![그림09](https://ji-hun-park.github.io/assets/images/그림32.jpg "그림09"){: .align-center}
+`unistd.h`가 반드시 include(인클루드, 포함) 되어야 합니다.  
+파일 오프셋을 바꿔주는 역할입니다.
+```c
+off_t nepos;
+
+newpos = lseek(fd, (off_t)-16, SEEK_END);
+
+----------------------------------------------------------------------------
+
+fd = open(fname, O_RDWR);
+lseek(fd, (off_t)0, SEEK_END);
+write(fd, outbuf, OBSIZE);
+
+	    ==
+
+fd = open(fname, O_WRONLY|O_APPEND);
+write(fd, outbuf, OBSIZE);
+
+----------------------------------------------------------------------------
+
+off_t filesize;
+int filedes;
+
+filesize = lseek(fd, (off_t)0, SEEK_END); /* filesize is the size of file */
+```
+### 코드 설명
+off_t(프리미티브 시스템 데이터 타입, int나 long)  
+lseek(fd(오픈이나 크리에이트해야함),오프셋,스타트_플래그)  
+Disk(디스크, 랜덤 엑세스(접근) 가능한) 레귤러 파일에서만 사용 가능합니다.
+
+파일 오프셋(file offset)은 다음에 읽거나 쓸 위치를 표시한 것입니다.  
+오프셋(offset)은 +-를 가지고, 스타트_플래그부터 오프셋(offset)만큼 +면 앞으로 –면 뒤로 이동합니다.
+
+스타트 플래그는 3가지 값을 가질 수 있습니다.
+
+>시크_셋(SEEK_SET) 0, 파일의 시작 위치를 기준, 이전으로 갈 수 없음  
+시크_커(SEEK_CUR) 1, 현재의 파일 오프셋 기준  
+시크_엔드(SEEK_END) 2, 파일의 마지막 기준, 이후로 갈 수 있음
+
+`newpos`에 lseek를 넣는데, 내용은 fd번 파일에, 16만큼 전으로, 엔드 오브 파일(EOF)로 파일 오프셋 이동입니다.
+
+`fname` read write only(읽기 쓰기 전용)로 엽니다.  
+엘시크(lseek)로 엔드 오브 파일(EOF)로 오프셋을 이동시킵니다.  
+write로 fd에 `OBSIZE`만큼 `outbuf`에 넣어서 라이트합니다.  
+이건 파일을 라이트온리(쓰기 전용) 어펜드로 열어서 라이트하는 것과 같은 기능입니다.(경계선 안에 == 전후 코드들)
+
+`filesize`에 lseek(fd,0,SEEK_END)를 넣으면 오프셋이 `마지막`을 가리키는데, 그 값이 파일의 `사이즈`입니다.
+
+## File Share
+
 ![그림10](https://ji-hun-park.github.io/assets/images/그림33.jpg "그림10"){: .align-center}
 ![그림11](https://ji-hun-park.github.io/assets/images/그림34.jpg "그림11"){: .align-center}
 ![그림12](https://ji-hun-park.github.io/assets/images/그림35.jpg "그림12"){: .align-center}
