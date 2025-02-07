@@ -718,8 +718,57 @@ fd 4에서 읽어서 오프셋이 30으로 바뀌어도 fd 3의 오프셋은 그
 close하면 `해당 파일의 테이블`만 없어집니다.  
 `v-노드`는 파일이 디스크 안에 `존재`하면 절대적으로 `존재`합니다!(close해도 안 없어짐!)
 
+## The dup(2)and dup2(2)system call
+```c
+#include <unistd.h>
+
+int dup(int filedes);
+int dup2(int filedes, int filedes2);
+
+//Both return: new file descriptor if OK, -1 on error
+```
+기존 파일 서술자는 다음 함수 중 하나에 의해 복제됩니다.
+```c
+newfd = dup(1) /* STDOUT_FILENO #1 */
+	==
+newfd = fcntl(1, F_DUPFD, 0);
+	!=
+newfd = 1
+```
 ![그림14](https://ji-hun-park.github.io/assets/images/그림37.jpg "그림14"){: .align-center}
+`dup2`는 파일 디스크립터(앞에 걸)를 복제(뒤에 걸로)합니다.  
+`dup`은 파일디스크립터가 새로 카피(복제)되어 오픈(lowest unused integer로)됩니다.
+
+예제 – dup(1)으로 fd 1을 새로운 fd 3으로 카피해서 만들었고, 이 경우 파일 테이블은 동일합니다.  
+즉, 같은 파일 테이블을 2개의 파일 포인터가 가리키므로 파일 스테이터스 플래그가 2입니다.  
+이는 `파일 컨트롤(fcntl)`의 커멘드 `둡 파일 디스크(F_DUPFD)`랑 같습니다.  
+1번을 0보다 큰 번호 중 안 쓰이는 가장 작은 번호로 카피합니다.
+
+### Example : dup2(2)
+```c
+-----------------------------------------------
+|fd4 = open(“test”, O_RDONLY); /* fd4 == 4  */|
+-----------------------------------------------
+dup2(3, fd4);	/* test’s file descriptor closed */
+
+==
+
+close(fd4);
+fcntl(3, F_DUPFD, fd4)
+```
 ![그림15](https://ji-hun-park.github.io/assets/images/그림38.jpg "그림15"){: .align-center}
+*기존에 fd3 = open("file", O_RDWR); 실행한 상황  
+둡2 – 본래 fd4는 `test`라는 파일을 가리키고 있었는데, 이걸 오픈하고 fd3의 내용을 fd4에 카피(포인터가 가리키는 시작 주소의 변경)하면 기존에 가리키던 포인터가 끊어집니다.(count가 0이므로 test의 파일 서술자가 종료됩니다.)  
+둘은 결과적으로 같은 v-node table(같은 파일)을 가리킵니다.  
+`test`의 파일 테이블의 count는 1에서 0이 되고, 새로운 file table의 count는 1에서 2가 됩니다.
+
+## The fcntl(2) system call
+### The fcntl(2) system call (1/2)
+
+
+### The fcntl(2) system call (2/2)
+
+
 ![그림16](https://ji-hun-park.github.io/assets/images/그림39.jpg "그림16"){: .align-center}
 ![그림17](https://ji-hun-park.github.io/assets/images/그림40.jpg "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/그림41.jpg "그림18"){: .align-center}
