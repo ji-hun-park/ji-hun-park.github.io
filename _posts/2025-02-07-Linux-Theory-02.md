@@ -138,9 +138,86 @@ close(fd)해서 끝냅니다.
 
 include에서 <fcntl.h>는 /usr/include/fcntl.h를 나타냅니다.  
 /usr/include/가 디폴트 디렉토리 “ ”로 경로 지정 가능합니다.  
-fcntl.h는 헤더 파일인데 오픈 시스템 콜을 쓸 때 필수로 include 해야합니다.
+fcntl.h는 헤더 파일인데 open 시스템 콜을 쓸 때 필수로 include 해야합니다.
 
+## The open(2) system call
+### () 설명
+>()안에 숫자에 따라  
+1: 커멘드, 2: 시스템 콜, 3: 라이브러리  
+를 의미합니다! (해당 표기는 뒤에도 계속 나올 예정)
+
+### The open(2) system call (1/2)
+```c
+#include <fcntl.h> 
+
+int open(const char *pathname, int flags, [mode_t mode]);
+
+
+//Returns: file descriptor if OK, -1 on error 
+```
+* 파일은 open 함수 호출에 의해 열리거나 생성됩니다.
+
+오픈 시스템 콜을 쓰기 위해 fcntl.h 헤더 파일을 반드시 인클루드해야 합니다.  
+[]안에 있는 건(mode) 필수가 아닌 선택 사항(옵션).  
+상수 캐릭터의 *(포인터)는 문자열(string) 파일 네임(패스네임).  
+플래그는 아규먼트(RDONLY - 0, 읽기만 할 것인지, WRONLY - 1, 쓰기만 할 것인지, RDWR – 2, 둘 다 할 것인지).
+
+> Arguments
+>> - flags:
+>>> + O_RDONLY	#0	Open for reading only.(읽기 전용)
+>>> + O_WRONLY	#1	Open for writing only.(쓰기 전용)
+>>> + O_RDWR	#2	Open for reading and writing.(읽기 쓰기)
+>>
+>> 이 세 가지 상수 중 하나만 지정해야 합니다.
+
+```
+왜 플래그가 세 개인가요? O_RDWR을 없애고 O_RDONLY | O_WRONLY만 사용할 수 없나요?  
+    안됩니다, 구현에서 항상 O_RDONLY를 0으로 정의했기 때문입니다.  
+→ O_RDONLY | O_WRONLY == O_WRONLY
+```
+
+### The open(2) system call (2/2)
+#### optional flags
+- O_APPEND - 쓰기 시마다 파일 끝에 추가합니다.
+- O_CREAT - 파일이 없으면 생성합니다.
+- O_EXCL - O_CREAT가 지정되었고 파일도 이미 있으면 오류를 생성합니다.
+- O_TRUNC 파일이 있으면 길이를 0으로 자릅니다.
+- O_NONBLOCK 비차단 파일 열기.
+
+#### mode
+- O_CREAT 플래그와 함께 사용만 가능
+- 파일 보안 권한(File security permission)
+
+#### example
+```c
+#include <stdlib.h>	/* exit() */
+#include <fcntl.h>	/* open() */
+
+char *workfile = “junk”;
+
+main()
+{
+    int fd;
+    if( (fd = open(workfile, O_RDWR)) == -1)
+    {
+        printf(“Couldn’t open %s\n”, workfile);
+        exit(1);
+    }
+
+    exit(0);
+}
+```
+
+대부분의 표준 포함 파일(standard include files)은 일반적으로 /usr/include 디렉토리에 있습니다.  
+프로세스당 20개의 열린 파일입니다.  
+하지만 오늘날 대부분의 UNIX 시스템은 20개 이상을 제공합니다.
+
+## File open flag
+![추가그림1](https://ji-hun-park.github.io/assets/images/image01.png "추가그림1"){: .align-center}
+
+## File permissions
 ![추가그림2](https://ji-hun-park.github.io/assets/images/image02.png "추가그림2"){: .align-center}
+
 ![그림05](https://ji-hun-park.github.io/assets/images/그림28.jpg "그림05"){: .align-center}
 ![그림06](https://ji-hun-park.github.io/assets/images/그림29.jpg "그림06"){: .align-center}
 ![그림07](https://ji-hun-park.github.io/assets/images/그림30.jpg "그림07"){: .align-center}
@@ -159,8 +236,7 @@ fcntl.h는 헤더 파일인데 오픈 시스템 콜을 쓸 때 필수로 include
 ![그림20](https://ji-hun-park.github.io/assets/images/그림43.jpg "그림20"){: .align-center}
 
 ## 작성중
-![추가그림1](https://ji-hun-park.github.io/assets/images/image01.png "추가그림1"){: .align-center}
 
 ## 마무리
-이상으로 Linux의 파일1편을 마치겠습니다.  
+이상으로 Linux 이론의 파일1편을 마치겠습니다.  
 긴 글 읽어주셔서 감사합니다!
