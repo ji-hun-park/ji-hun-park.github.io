@@ -444,7 +444,7 @@ fd에 3이 들어가고, 이를 read에 인자로 주면 3번 파일에서 512by
 파일 테이블 데이터 스트럭쳐에서 마지막은 파일의 위치를 가리킵니다.  
 읽을 때마다 파일 오프셋이 업데이트 됩니다.  
 타일 테이블을 가리키는 디스크립터가 하나라는 제약은 없습니다.  
-카운트는 자신을 가리키는 포인터 수입니다.
+카운트는 자신을 가리키는 포인터의 수입니다.
 
 ## The write(2) system call
 ```c
@@ -621,12 +621,77 @@ write로 fd에 `OBSIZE`만큼 `outbuf`에 넣어서 라이트합니다.
 
 `filesize`에 lseek(fd,0,SEEK_END)를 넣으면 오프셋이 `마지막`을 가리키는데, 그 값이 파일의 `사이즈`입니다.
 
-## File Share
+아래는 참고만  
+```c
+02_append.c
+02_append_lseek.c
+02_append_end.c
+/****************************** append ******************************/
+$ cat > 02_append_file
+xxxxx^D
+$ ./append 02_append_file &
+[1] 9903
+Press any key!!
+$  ./append_end 02_append_file 
+Press any key!!
+End : Press any key!!
+[1]+  Stopped                 ./append 02_append_file
+$ cat 02_append_file 
+xxxxxeeeee
+$ fg 1
+./append 02_append_file
+$ cat 02_append_file
+xxxxxeeeeeaaaaa
+/****************************** append ******************************/
 
+/****************************** lseek ******************************/
+$ cat > 02_append_file
+xxxxx^D
+$ ./append_lseek 02_append_file &
+[1] 9903
+Press any key!!
+$  ./append_end 02_append_file 
+Press any key!!
+End : Press any key!!
+[1]+  Stopped                 ./append 02_append_file
+$ cat 02_append_file 
+xxxxxeeeee
+$ fg 1
+./append_lseek 02_append_file
+$ cat 02_append_file
+xxxxxaaaaa
+/****************************** lseek ******************************/
+```
+## File Share
+### File Share (1/4)
+- 모든 프로세스는 `프로세스 테이블`에 엔트리를 가지고 있습니다.
+- 각 프로세스 테이블 엔트리 내에는 열린 파일 서술자 테이블이 있습니다.
+    - 파일 서술자 플래그
+    - 파일 테이블 엔트리에 대한 포인터
+
+- 커널은 모든 열린 파일에 대한 `파일 테이블`을 유지 관리합니다. 각 파일 테이블 엔트리에는 다음이 포함됩니다.
+    - 파일의 파일 상태 플래그(읽기, 쓰기 등)
+    - 현재 파일 오프셋
+    - 파일의 v-노드 테이블 엔트리에 대한 포인터
+
+- 열려 있는 각 파일(또는 장치)에는 파일 유형에 대한 정보와 파일에서 작동하는 함수에 대한 포인터가 포함된 v-노드 구조가 있습니다.
+
+### File Share (2/4)
 ![그림10](https://ji-hun-park.github.io/assets/images/그림33.jpg "그림10"){: .align-center}
 ![그림11](https://ji-hun-park.github.io/assets/images/그림34.jpg "그림11"){: .align-center}
+
+### File Share (3/4)
+```c
+$ ./a.out	/* fd = open(“test”, O_RDONLY); */
+
+$ ./b.out	/* fd = open(“test”, O_RDONLY); */
+```
 ![그림12](https://ji-hun-park.github.io/assets/images/그림35.jpg "그림12"){: .align-center}
-![그림13](https://ji-hun-park.github.io/assets/images/그림36.jpg "그림13"){: .align-center}
+
+### File Share (4/4)
+![그림21](https://ji-hun-park.github.io/assets/images/그림44.jpg "그림21"){: .align-center}
+
+
 ![그림14](https://ji-hun-park.github.io/assets/images/그림37.jpg "그림14"){: .align-center}
 ![그림15](https://ji-hun-park.github.io/assets/images/그림38.jpg "그림15"){: .align-center}
 ![그림16](https://ji-hun-park.github.io/assets/images/그림39.jpg "그림16"){: .align-center}
