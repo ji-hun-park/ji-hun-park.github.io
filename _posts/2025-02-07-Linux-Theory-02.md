@@ -157,7 +157,7 @@ int open(const char *pathname, int flags, [mode_t mode]);
 ```
 * 파일은 open 함수 호출에 의해 열리거나 생성됩니다.
 
-오픈 시스템 콜을 쓰기 위해 fcntl.h 헤더 파일을 반드시 인클루드해야 합니다.  
+오픈 시스템 콜을 쓰기 위해 `fcntl.h` 헤더 파일을 반드시 인클루드해야 합니다.  
 []안에 있는 건(mode) 필수가 아닌 선택 사항(옵션).  
 상수 캐릭터의 *(포인터)는 문자열(string) 파일 네임(패스네임).  
 플래그는 아규먼트(RDONLY - 0, 읽기만 할 것인지, WRONLY - 1, 쓰기만 할 것인지, RDWR – 2, 둘 다 할 것인지).
@@ -176,6 +176,8 @@ int open(const char *pathname, int flags, [mode_t mode]);
 → O_RDONLY | O_WRONLY == O_WRONLY
 ```
 
+> 플래그는 `|`(비트 와이즈 오어)하면 비트 단위로 연산하기에 read \| write는 그냥 write(read가 0이므로)
+
 ### The open(2) system call (2/2)
 #### optional flags
 - O_APPEND - 쓰기 시마다 파일 끝에 추가합니다.
@@ -184,9 +186,27 @@ int open(const char *pathname, int flags, [mode_t mode]);
 - O_TRUNC 파일이 있으면 길이를 0으로 자릅니다.
 - O_NONBLOCK 비차단 파일 열기.
 
+플래그 옵션에는 APPEND, CREAT, EXCL, TRUNC 등이 있고, NONBLOCK은 필요 없으니 생략합니다.  
++ 어펜드는 파일 끝에 write할 때 어펜드(추가)합니다.  
++ 크리에이트는 존재하지 않는 파일을 만들 때 씁니다.  
++ 익스클루시브는 제너레이트 에러(생성 오류), O_크리에이트 지정 했을 때 파일이 이미 존재하면 에러를 생성합니다.  
++ 트런크는 오픈할 때 파일이 이미 존재하면 다 지웁니다.
+
 #### mode
 - O_CREAT 플래그와 함께 사용만 가능
 - 파일 보안 권한(File security permission)
+
+```c
+fd = open(“/tmp/newfile”, O_WRONLY|O_CREAT, 0644);
+/* if isExist(file) “file open” else “file create & open” */ 
+
+fd = open(“/tmp/newfile”, O_WRONLY|O_CREAT|O_EXCL, 0644);
+/* if isExist(file) “open error” else “file create & open” */
+
+fd = open(“/tmp/newfile”, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+/* if isExist(file) “file truncate & open ” else “file create & open” */
+```
+* 마지막 숫자는 퍼미션입니다.
 
 #### example
 ```c
@@ -208,18 +228,224 @@ main()
 }
 ```
 
-대부분의 표준 포함 파일(standard include files)은 일반적으로 /usr/include 디렉토리에 있습니다.  
-프로세스당 20개의 열린 파일입니다.  
-하지만 오늘날 대부분의 UNIX 시스템은 20개 이상을 제공합니다.
+* 대부분의 표준 포함 파일(standard include files)은 일반적으로 /usr/include 디렉토리에 있음
+* 프로세스당 20개의 열린 파일
+* 하지만 오늘날 대부분의 UNIX 시스템은 20개 이상을 제공함
+
+오픈할 때 파일 컨트롤 헤더는 인클루드(include) 필수입니다.  
+exit(엑시트)는 써도 되고 안 써도 됩니다.  
+엑시트는 실행을 종료할 때 사용하는데, 이걸 쓰려면 스탠다드 라이브러리 헤드`(stdlib.h)` 인클루드가 반드시 필요합니다.  
+`workfile`은 캐릭터 타입 junk라는 문자열(파일네임)에 대한 포인터입니다.  
+`정크(junk)`라는 파일을 read write로 open합니다.(있으면 성공, 없으면 실패)  
+이 때 fd가 –1이라면(실패하면) 에러 메시지를 출력하고, exit(1)로 빠져나갑니다.
 
 ## File open flag
 ![추가그림1](https://ji-hun-park.github.io/assets/images/image01.png "추가그림1"){: .align-center}
++ 맨 앞의 것은 경로 밑 파일명
++ 파일이 있으면 true, 없으면 false
++ 맨 뒤 숫자는 permission(퍼미션, 권한)
++ 시스템 콜이 실패하면 fd가 음수로 나옴
+
+1. 첫 번째는 파일이 있으면 열고 없으면 에러
+2. 두 번째는 파일이 있으면 열고 없으면 파일을 새로 만들고 열기
+3. 세 번째는 파일이 있으면 오픈 에러, 없으면 만들고 열기, 없을 때만 실행
+4. 네 번째는 파일이 있으면 기존 데이터 지우고 오픈 없으면 만들고 열기
+5. 다섯 번째는 파일이 있으면 기존 내용 뒤에 라이트하면서 열기, 없으면 에러
 
 ## File permissions
 ![추가그림2](https://ji-hun-park.github.io/assets/images/image02.png "추가그림2"){: .align-center}
+유닉스는 멀티 유저 시스템이라 유저가 굉장히 많아서 유저를 그룹화 했습니다.  
+어떤 유저는 어떤 그룹에 속합니다.(여러 그룹에 속할 수도 있지만 보통은 한 개의 그룹에 속함)  
+user, group, others 퍼미션 모두 3비트입니다.
 
+>r은 readable(읽을 수 있는 권리)  
+w는 writeable(쓸 수 있음)  
+x는 executable(실행 파일이라면 실행해서 프로세스 만들 수 있음)
+
+>유저는 파일의 오너  
+그룹은 파일의 유저가 속한 그룹에 있는 다른 유저들  
+아더스는 타 그룹
+
+- 맨 앞에 –는 레귤러 파일임을 나타냄
+- ls –l test 하면 `test`란 파일의 정보를 봄
+- 첫 글자(파일 타입) 뒤에 9자리는 3개씩 끊어서 봄
+    - -는 권한 없음(자신도 권한 없으면 안 됌)
+    - 특정 문자는 해당 권한 있음
+    - 그 뒤에 나오는 이름이 오너
+    - 오너 뒤가 그룹명
+- 퍼미션은 `bit(비트)`로 이루어져 있기에 숫자로 표현 가능
+    - 앞에서부터 차례대로 표현
+    - 0과 1로 표현
+        - 0은 권한 없음
+        - 1은 권한 있음
+- 8진수로 표시 가능
+    - 764 = 111 110 100 = rwx rw- r--
+        - 유저(읽기,쓰기,실행) 그룹(일기, 쓰기) 나머지(읽기)
+- 파일의 오너가 퍼미션을 체인지 모드로 변경 가능
+    - chmod u+x test – 유저에다 익스큐트 퍼미션 추가
+    - chmod g-r test – 그룹에다 리드 퍼미션 삭제
+    - chmod o+w test – 아더스에 라이트 퍼미션 추가
+- 혹은 숫자로 한꺼번에 변경 가능
+- 파일의 오너만 퍼미션 변경 가능
+
+## Symbolic names for file permissions 
 ![그림05](https://ji-hun-park.github.io/assets/images/그림28.jpg "그림05"){: .align-center}
+
++ 파일 퍼미션을 디모닉한 심볼 네임으로 주기도 함(잘 안 씀)
+    + 숫자로 쓰는게 편함
++ 앞에다 S_를 항상 쓰게 되어있음
++ `fcntl.h` 헤더에 들어있음
++ 공통적으로 `I`가 들어감
+
+```c
+int fd; 
+mode_t fdmode = ( S_IRUSR | 
+		  S_IWUSR | 
+		  S_IRGRP | 
+		  S_IROTH );
+
+fd = open(“file”, O_RDWR | O_CREAT, fdmode);
+```
+
+## The creat(2) system call
+```c
+#include <fcntl.h> 
+
+int creat(const char *pathname, mode_t mode);
+
+
+//Returns: file descriptor if OK, -1 on error 
+```
+패스네임을 주면 그 이름의 파일을 ,뒤에 퍼미션을 주고서 만듭니다.  
+모드(mode) 부분에 4자리 숫자로 퍼미션을 주면 됩니다.  
+mode_t(unsigned int)는 프로미티브 시스템 데이터 타입입니다.  
+반환(return)은 파일 디스크립터가 리턴됩니다.(에러일 경우 –1 리턴)
+
+- 파일을 만드는 또 다른 방법.
+- 파일이 이미 존재하는 경우 두 번째 인자는 무시됩니다.
+- open과 달리 creat는 파일 서술자를 반환하기 전에 항상 기존 파일을 잘라냅니다.
+- creat는 항상 쓰기 전용으로 파일을 엽니다.
+
+```c
+fd = creat(“/tmp/newfile”, 0644);
+
+==
+
+fd = open(“/tmp/newfile”, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+```
+- 위의 코드 두 줄은(맨 위와 맨 아래) 서로 같은 명령어
+
+이미 있을 땐 잘라버리고 열어 버리고, 없을 때는 새로 생성해서 엽니다.  
+크리에이트는 항상 트런케이트 합니다.  
+항상 라이트 온리로 오픈 합니다.  
+
+## Owner and permission of a new file
+### When you create a new file (open or create)
+새로운 파일이 오픈이나 크리에이트해서 만들어지면 부모(parent) 디렉토리에 새로운 이름이 쓰여집니다.  
+즉 이를 위해 부모 디렉토리의 라이트 퍼미션이 필요합니다.(이는 올라 올라 루트까지 다 있어야 합니다.)  
+디렉토리는 안에 있는 파일들의 목록을 지닌 파일일 뿐입니다.
+
+### Who owns it?
+누가 오너(소유자)인가?  
+프로세스 유저 아이디에는 `effective(이펙티브)`랑 `real(리얼)` 2가지가 있습니다.(그룹 아이디도 마찬가지)  
+소유자는 프로세스의 유효(effective) 사용자 ID로 설정됩니다.  
+그룹은 프로세스의 유효(effective) 그룹 ID로 설정됩니다.  
+이는 파일을 만들 때 프로세스가 만듭니다.
+
+## The close(2) system call
+```c
+#include <unistd.h>
+
+int close(int filedes);
+
+
+//Returns: 0 if OK, -1 on error 
+```
+간단한 클로즈 시스템 콜입니다.  
+파일 디스크럽트(파일 서술자)가 `filedes` 자리에 들어갑니다.  
+열린 파일은 close로 닫힙니다.  
+전체적인 혼란을 방지하기 위해, 프로그램이 실행을 완료(종료)하면 close를 안해도 모든 열린 파일이 자동으로 닫힙니다.
+```c
+fd = open(“/tmp/newfile”, O_RDONLY);
+	.
+	.
+	.
+fd = close(fd);
+```
+
+## The read(2) system call
+### The read(2) system call (1/2)
+```c
+#include <unistd.h>
+
+ssize_t read(int filedes, void *buffer, size_t n);
+
+
+//Returns: number of bytes read, 0 if end of file, -1 on error
+```
+파일을 읽으면 현재 파일 위치에서 메모리로 바이트가 복사되고, 그런 다음 파일 위치가 업데이트됩니다.  
+- Arguments(인자들)
+    - filedes
+        - 파일 서술자(open 또는 creat에서 얻음)
+    - buffer
+        - 데이터가 복사될 배열이나 구조에 대한 포인터입니다.
+    - n
+        - 파일에서 읽을 바이트 수입니다.
+
++ 캐릭터 타입 포인터 buffer(void면 타입을 미리 정하지 않음, 무조건 포인터가 들어가야 함!)
+    * 메모리의 시작 위치를 가리키는 변수
++ n이 가리키는 byte의 수만큼 읽어서
+    + 파일 디스크립트(파일 서술자)가 가리키는 파일에서
+        + 버퍼가 가리키는 시작 주소부터
+            + n만큼 넣으라는 의미
++ size_t는 프리미티브 시스템 데이터 타입(인티져(int) 정도)
++ 리드의 리턴은 실제로 읽은 바이트의 수가 리턴됨(실패시 –1 리턴)
++ 파일의 마지막에 도착한 상태에서 읽으면 하나도 못 읽어서 0 리턴`(중요!)`
+
+### The read(2) system call (2/2)
+```c
+int fd;
+ssize_t n1, n2, n3;
+char buf1[512], buf2[512], buf3[512];
+
+if( (fd = open(“foo”, O_RDONLY)) == -1)
+    return -1;
+
+			        /* f_offset : 0 */
+n1 = read(fd, buf1, 512);	/* n1 : 512, f_offset : 512 */
+n2 = read(fd, buf2, 512);	/* n2 : 188, f_offset : 700 */
+n3 = read(fd, buf3, 512);	/* n3 : 0, when read EOF */
+```
 ![그림06](https://ji-hun-park.github.io/assets/images/그림29.jpg "그림06"){: .align-center}
+- File descriptor table에서 File Table을 가리키고, File Table에서 File을 가리킵니다!
+
+파일은 오픈할 때 `파일 포지션(파일 오프셋)`이 정해집니다.(대개는 맨 앞, `어펜드`면 맨 뒤를 가리킨다)  
+현재 읽을 위치를 가리킵니다.  
+n(읽을 데이터의 개수)만큼 읽고나면 파일 포지션이 n의 마지막으로 이동하고, 읽을 때마다 위치를 이동합니다.  
+파일 포지션은 리드나 라이트할 때 그걸 실행할 위치를 가리킵니다.(읽거나 쓴 만큼 다음 포지션이 이동합니다.)
+
+#### 코드 설명
+ssize_t(int) 타입 3개, 캐릭터 타입 버퍼 3개(사이즈 512)가 있습니다.  
+현재 디렉토리 밑에 `foo`라는 이름의 파일을 read only(읽기 전용)로 읽습니다.  
+반환된 값이 –1, 즉 읽지 못 했을 때(파일이 없을 때나 읽을 권한이 없을 때) -1을 리턴합니다.  
+fd에 3이 들어가고, 이를 read에 인자로 주면 3번 파일에서 512byte만큼 읽습니다.  
+푸의 사이즈는 700byte입니다.  
+파일 오프셋(포지션)은 처음에는 시작 위치(0)를 가리키고 512 byte만큼 읽으면, 512바이트만큼 뒤로 오프셋을 변경합니다.  
+이 때 512를 읽으라고 명령하면 남은 188byte만큼만 읽습니다.  
+이 때 700 위치를 가리킵니다.`(EOF, 엔드 오브 파일)`  
+첫 번째 위치가 0, 마지막 위치는 699입니다.(700이 아님!)  
+700이 가리키는 곳은 데이터가 없습니다.(End of File)  
+`n2`가 끝나면 700을 가리키게 되고, 마지막은 읽을 게 없어서 0이 리턴됩니다.
+
+#### 이미지 설명
+[이미지](https://ji-hun-park.github.io/linux/Linux-Theory-02/#the-read2-system-call-22)는 커널 안의 구조(데이터 스트럭쳐)입니다.  
+유저 프로그램에서 파일을 오픈하면 파일 디스크립터 테이블이 생성됩니다.  
+3번에 `foo`라는 파일을 가리키는, 파일 테이블을 가리키는 포인터가 테이블에 추가됩니다.  
+파일 테이블 데이터 스트럭쳐에서 마지막은 파일의 위치를 가리킵니다.  
+읽을 때마다 파일 오프셋이 업데이트 됩니다.  
+타일 테이블을 가리키는 디스크립터가 하나라는 제약은 없습니다.  
+카운트는 자신을 가리키는 포인터 수입니다.
+
 ![그림07](https://ji-hun-park.github.io/assets/images/그림30.jpg "그림07"){: .align-center}
 ![그림08](https://ji-hun-park.github.io/assets/images/그림31.jpg "그림08"){: .align-center}
 ![그림09](https://ji-hun-park.github.io/assets/images/그림32.jpg "그림09"){: .align-center}
