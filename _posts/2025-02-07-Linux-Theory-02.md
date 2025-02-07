@@ -764,12 +764,101 @@ fcntl(3, F_DUPFD, fd4)
 
 ## The fcntl(2) system call
 ### The fcntl(2) system call (1/2)
+```c
+#include <fcntl.h>
 
+int fcntl(int filedes, int cmd, ...);
+
+//Returns: depends on cmd if OK (see following), , -1 on error
+```
+fcntl(파일 컨트롤) 함수는 이미 열려 있는 파일의 속성을 변경할 수 있습니다.
+- Arguments(인자들)
+    - filedes: 파일 설명자(open 또는 creat에서 얻음)
+    - cmd: 프로그래머는 정수 cmd 매개변수에 대한 값을 선택하여 특정 함수를 선택합니다.
+        - F_DUPFD: 기존 파일 서술자를 복제합니다.
+        - F_GETFD 또는 F_SETFD: 파일 서술자 플래그를 가져오거나 설정합니다 → ch05
+        - F_GETFL 또는 F_SETFL: 파일 상태 플래그를 가져오거나 설정합니다.
+        - F_GETOWN 또는 F_SETOWN: 비동기 I/O 소유권을 가져오거나 설정합니다 → ch06
+        - F_GETLK, F_SETLK 또는 F_SETLKW: 레코드 잠금을 가져오거나 설정합니다 → ch08
+
+파일 컨트롤(시스템 콜) - `fcntl.h`(파일컨트롤.헤드)가 반드시 include(인클루드, 포함) 되어야 합니다.  
+엘리먼트1(첫 번째 인자)은 파일 디스크립터(서술자), 엘리먼트2(두 번째 인자)는 명령어, 세 번째 아규먼트(인자)는 안 들어갈 수 있습니다(옵션).  
+실패하면 –1이 리턴되는 것은 앞이랑 같습니다.  
+성공하면 명령어에 따라 리턴 값이 달라집니다.
+
+각각의 명령어 표준의 대한 상세한 설명은 `susv4.zip`에 있습니다.  
+DUPFD – 둡과 같은 기능입니다.  
+F_GETFL 또는 F_SETFL – 겟 / 셋 파일 스테이터스(상태) 플래그스(fcntl(1,dup,0))
 
 ### The fcntl(2) system call (2/2)
+```c
+#include <fcntl.h>
+
+int filestatus(int filedes)
+{
+  int arg1;
+
+  if (( arg1 = fcntl (filedes, F_GETFL)) == -1)
+  {
+    printf ("filestatus failed\n"); 
+    return (-1);
+  }
+
+  printf ("File descriptor %d: ",filedes);
+
+  /* 개방시의 플래그를 테스트한다. */
+  switch ( arg1 & O_ACCMODE){
+    case O_WRONLY: printf ("write-only"); break;
+    case O_RDWR:   printf ("read-write"); break;
+    case O_RDONLY: printf ("read-only");  break;
+    default: printf("No such mode");
+  }
+
+  if (arg1 & O_APPEND)
+    printf (" -append flag set");
+
+  printf ("\n");
+  return (0);
+}
+```
+![추가그림3](https://ji-hun-park.github.io/assets/images/image03.png "추가그림3"){: .align-center}
+예제 – fd만으로 해당 파일이 어떤 권한으로 오픈되었는지를 알아보는 코드
+
+어떤 파일디스크립터를 리턴을 받습니다(그 이전에 파일을 오픈한 상태).  
+`F_GETFL`(파일 겟 스페이터스 플래그스) 명령을 주면(3번째 아규먼트(인자)는 필요 없음), 리턴 값이 –1이면 실패하고 아니면 열린 정보를 리턴합니다(arg1에 이 정보 저장).
+
+switch문으로 arg1에서 엑세스 모드와 & 연산해 결과에 따라 출력합니다.(이에 관한 정보는 fcntl.h에 저장되어 있음)  
+#define O_ACCMODE 3(미리 정해진 값), 이걸 &(비트와이즈앤드)연산해서,  
+그 결과 값으로 라이트온리인지 리드라이트인지 리드온리인지 판단합니다.
+
+O_APPEND랑 &할 시 해당 위치에서 연산해 어펜드 플래그가 셋 되어있는지 판단합니다.  
+파일 컨트롤의 겟 스테이터스 플래그 명령어를 써서 플래그들을 알 수 있습니다.
+
+# 2.2 Standard input, standard output and standard error
+
+## Redirection
+### Redirection (1/3)
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+	char buf[BUFSIZ];
+	while( read(0, buf, BUFSIZ) )
+	{
+		printf("%s", buf);
+	}
+	return 0;
+}
+```
+![그림16](https://ji-hun-park.github.io/assets/images/그림45.jpg "그림16"){: .align-center}
+
+### Redirection (2/3)
+
+### Redirection (3/3)
 
 
-![그림16](https://ji-hun-park.github.io/assets/images/그림39.jpg "그림16"){: .align-center}
 ![그림17](https://ji-hun-park.github.io/assets/images/그림40.jpg "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/그림41.jpg "그림18"){: .align-center}
 ![그림19](https://ji-hun-park.github.io/assets/images/그림42.jpg "그림19"){: .align-center}
