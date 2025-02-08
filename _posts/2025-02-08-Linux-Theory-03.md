@@ -23,7 +23,31 @@ last_modified_at: 2025-02-08T20:00:00-23:59
 
 ## Users and ownerships
 ### Users and ownerships (1/3)
+<b>소유자</b>  
+유닉스는 멀티 유저 시스템, 어떤 유저가 파일을 만들면 그 파일의 오너(Owner, 소유자)가 됩니다.  
+UNIX 시스템의 모든 파일은 시스템 사용자 중 한 명이 소유합니다.  
+소유자는 일반적으로 파일을 만든 사용자입니다.(아닌 경우도 있음)
+
+- 소유자의 실제 ID(identity)
+    - user-id(종종 uid로 축약)
+    - 특정 사용자 이름과 연관된 uid
+
+<span style="color:#0000FF">usr/etc/passwd 안에 한 줄로 등록 됩니다.</span>  
+>예제: keith:x:35:10::user/keith:bin/ksh  
+>항목: login-id:password:uid:gid:user info/home-dir/shell
+
+- login-id – 2~8개의 영문소문자 또는 숫자로 구성된다.
+- password - 13자리의 암호화된 패스워드, 저기에 저장되지 않음
+- uid – 숫자로 된 유저 아이디, 0~60000
+- gid – 숫자로 된 그룹 아이디, 0~60000, 대응되는 이름도 있음
+- User Info – 사용자의 실제 풀 네임, 정보
+- home-dir – 로그인할 디렉토리 경로(루트 밑에 홈), 시스템마다 홈 디렉은 조금씩 다름
+- shell – 실행하면 $, %등 쉘 프람트가 뜨는데 최초로 실행되는 쉘 프로그램이 등록된다.
+
+<span style="background-color:#ffdce0">본래에는 여기에 패스워드가 저장되었으나 보안상의 문제로 다른 곳으로 옮겼습니다.
+
 ### Users and ownerships (2/3)
+
 ### Users and ownerships (3/3)
 ## Effective user-and group ids
 ## Permissions and file modes
