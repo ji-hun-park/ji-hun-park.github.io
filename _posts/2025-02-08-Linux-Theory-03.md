@@ -203,21 +203,268 @@ fd4 = open(“file5”, O_RDONLY);
     - fd5는 유저, 그룹이 다르고, 아더스는 권한이 없어서 실패
 
 ## The file access tests
-
+<b>커널이 파일 엑세스 퍼미션을 테스트하는 과정 정리(이전 조건이 맞으면 끝, 아니면 다음 단계로)</b>  
+1. 만약 프로세스의 이펙티브 유저 아이디가 <b>0</b>이면 슈퍼 유저이므로 무조건 허용
+2. 만약 프로세스의 이펙티브 유저 아이디가 파일의 오너 아이디랑 같으면서, 엑세스 퍼미션이 있다면 허용, 없으면 퍼미션이 디나이되어 실패하고 끝
+3. 만약 프로세스의 이펙티브 그룹 아이디가 같으면서, 그룹 엑세스 퍼미션이 있으면 허용, 없으면 퍼미션 디나이하고 끝
+4. 만약 아더스의 퍼미션이 있으면 허용, 없으면 퍼미션 디나이하고 끝
 
 ## Extra permission for executable files
 ### Extra permission for executable files (1/3)
+<b>일반적으로 파일에 실행 가능한 프로그램이 들어 있는 경우에만 해당됩니다.</b>
+![그림07](https://ji-hun-park.github.io/assets/images/그림52.jpg "그림07"){: .align-center}
+- S_ISUID 권한(permission)이 설정된 경우 실행 파일이 시작되면,
+    - 시스템은 프로세스를 시작한 사용자의 사용자 ID가 아닌 파일 소유자(file owner)로부터 가져온 유효(effective) 사용자 ID를 결과 프로세스(resulting process)에 제공합니다.
+
+사실 퍼미션은 기존 3가지(r,w,x) 말고 3가지 더 있습니다.  
+스티키 비트(sticky bit)는 별로 안 씁니다.
+
+- 옥탈(Octal, 8진수)로 3번째가 유저 퍼미션, 4번째가 그룹 퍼미션, 5번째가 아더스 퍼미션
+- 2번째 자리는 사실 3비트
+    - 3비트 중에서 첫 번째 비트가 1이면 셋 유저 아이디 온 엑스큐션 퍼미션(Set user-id on execution)
+    - 2번째 비트가 1이면 그룹 아이디(Set group-id on execution)
+    - 3번째 비트가 1이면 스티키 비트(sticky bit)
+- 셋 유저 아이디 온 엑스큐션(Set user-id on execution) 퍼미션이 셋(Set)되면 <b>실행파일</b>이 `실행`할 때만 의미가 있는 퍼미션
+- 비트(S_ISUID)가 세트되어 있는 실행파일을 시작할 때 시스템(커널)에서 프로세스가 만들어지고 uid의 리얼,이펙티브가 세팅
+- 셸의 리얼 유저 아이디(로그인한 자)를 uid로 설정
+- 이와 같은 euid를 세팅하는데 저 비트(S_ISUID)가 세팅되어 있으면
+    - 셸의 유저 아이디로 이펙티브 유저 아이디를 세팅하지 않고
+        - 파일의 오너의 유저 아이디를 이펙티브 유저 아이디로 취한다.
+- 이 경우 리얼 유저 아이디랑 이펙티브 유저 아이디가 <b>달라진다.</b>
+
 ### Extra permission for executable files (2/3)
+![그림08](https://ji-hun-park.github.io/assets/images/그림53.jpg "그림08"){: .align-center}
+\$ id로 내가 누구냐? 물어보면 답변으로 user1(아이디 100), group1(아이디 500)을 알려줍니다.  
+a.out이란 파일의 오너는 user2(타인), 해당 파일을 실행합니다.  
+셸의 여러 아이디는 내가 됩니다.  
+실행하면 a.out에서 프로세스 아이디는 내가 됩니다.
+
+다시 한 번 나를 확인하고, 체인지 모드(chmod) 실행(퍼미션을 바꿔줌)합니다.  
+퍼미션의 9비트 위에 3비트가 더 있습니다.(셋 유저,셋 그룹,스티키 비트 / s,g,t)  
+셋 유저 아이디 플래그를 1로 세팅합니다(u+s).  
+권한 X가 S로 바뀝니다.(X가 있어야 S가 의미 있음)
+
+다시 실행해보면 리얼 유아이디(ruid)는 그대로인데 이펙티브 유저 아이디(euid)는 파일의 오너로 바뀌었습니다.  
+이런 경우가 리얼과 이펙티브 유저(그룹) 아이디가 <b>다른</b> 경우입니다!
+
+실행 파일은 퍼미션(permission, 권한)을 이펙티브 유저 아이디로 구분, 해당 파일 오너의 권한으로 실행합니다.
+
 ### Extra permission for executable files (3/3)
+<b>sticky bit ( save-text-image )</b>  
+스티키 비트(세이브 텍스트, 이미지)는 디렉토리를 엑세스할 때 의미가 있으나, 예전의 의미로, 지금은 사용하지 않습니다.(참고만 할 것)
+
+- S_ISVTX 비트는 실행 파일에 설정할 수 있었습니다.
+- 이전 시스템에서는 파일에 save-text-image 비트가 설정된 경우 실행되고, 해당 program-text 부분은 시스템이 중단될 때까지 시스템의 스왑 영역에 남아 있었습니다.
+- 현대 UNIX 시스템에서는 이 비트가 이제 중복됩니다.
+- 현대 시스템은 디렉토리에 대해 S_ISVTX 비트를 정의합니다.
+
 ## How do you change your password?
+![그림09](https://ji-hun-park.github.io/assets/images/그림54.jpg "그림09"){: .align-center}
+<b>패스워드를 변경하는 경우</b>  
+<b>/etc/shadow를 직접 변경할 수 없습니다.</b>  
+<b>하지만 usr/bin/passwd는 /etc/shadow를 변경할 수 있습니다.</b>
+
+오너는 root, 셋 유저가 1로 세팅되어 있습니다.  
+`bin`의 `passwd`를 실행해서 비밀번호를 바꾸면 etc의 shadow가 업데이트 됩니다.  
+shadow의 오너는 root이고, 오너만이 read 가능합니다.
+
+나는 누구냐?(whoami) - 유저 아이디 100(user1)이라고 알려줍니다.  
+패스워드를 바꾸라는 메시지 출력 후 프로그램이 실행 됩니다.
+
+나의 셸 아이디는 원래 이러했으나(100, user1), `passwd`를 실행하면 나머지는 그대로 있고 `euid`만 <b>0(root)</b>가 됩니다!  
+이는 권한 s가 세팅되어 있기에 이렇게 바뀌게 되는 겁니다.
+
+그러면 이제 root의 권한으로 패스워드를 바꿀 수 있습니다(shadow에서 업데이트함).
+
+![그림10](https://ji-hun-park.github.io/assets/images/그림55.jpg "그림10"){: .align-center}
+
 ## The file creation mask
+- 각 프로세스와 관련된 값을 파일 생성 마스크라고 함함
+- 파일 생성 마스크(file creation mask, 보호(safeguarding))
+    - 파일이 생성될 때마다 특정 권한 비트를 자동으로 끔
+    - 지정된 권한이 실수로 켜지는 것을 방지함
+- 각 프로세스는 디폴트 파일 생성마스크 값을 가짐
+- 이것은 생성되는 파일에 부여되지 말아야 할 허가 권한들의 비트 마스크임
+- 사용자가 open이나 creat 시스템 콜을 사용할 때 mode를 지정하면 커널은 디폴트 마스크에 지정된 비트들을 소거함
+
+![그림00](https://ji-hun-park.github.io/assets/images/image04.png "그림00"){: .align-center}
+- mode에 &(비트와이즈앤드) 연산 수행, 위에선 mask에 ~(비트와이즈니게이션)함
+- 프로세스가 생성되면 프로세스의 액티베이트(activate) 값처럼 붙어 다님
+- 세이프가드(안전장치) 역할
+- 파일을 만들면 퍼미션을 세팅하는데 특정 퍼미션은 중요할 수 있음
+- 특별한 퍼미션 비트를 On하지 못하도록 자동으로 turn off 시킴
+- 우연히 turn on 되는 것을 방지해 주는 역할
+- 마스크 설정은 자동으로 Off하고 싶은 위치만 1로 설정(프로세스가 실행되기 전에 자동으로 설정되어져 있음)
+- 마스크를 안 붙여도 자동으로 마스크 붙인 채로 실행 되어짐
+- 그룹이나 아더스의 라이트 퍼미션을 자동으로 Off함
+    - 해당 권한을 주고 싶으면 마스크에서 해당 값을 지움
+
 ## The umask(2) system call
+```c
+#include <sys/stat.h>
+
+mode_t umask(mode_t cmask);  /* cmask는 new mask, return은 old mask */
+
+//mode_t oldmask; mode_t는 int 정도, 이전 마스크 값 저장
+
+//Returns: previous file mode creation mask
+```
+>umask 함수는 프로세스에 대한 파일 모드 생성 마스크를 설정합니다.
+
+```c
+umask(1) 
+	$ umask
+	$ umask –S //값을 보여줌
+	$ umask 22 //마스크 값을 22로 바꿔줌
+```
+```c
+mode_t oldmask;		/* 이전 마스크 값을 저장하기 위한 */
+.
+.
+.
+oldmask = umask(022);	/*  파일 소유자 이외의 사용자에게 쓰기 허가를 막는다 */
+```
+
 ### example
+```c
+#include <fcntl.h>
+#include <sys/stat.h>
+
+int specialcreat (const char *pathname, mode_t mode){
+  mode_t oldu;
+  int filedes:
+
+  /* 파일 생성 마스크를 0으로 설정 */
+  if ( (oldu = umask(0)) == ―1){
+ 	perror ("saving old mask");
+ 	return (-1);
+  }
+
+ /* 파일을 생성한다 */
+ if((filedes=open(pathname, O_WRONLY｜O_CREAT｜O_EXCL, mode)) == -1)
+	 perror ("opening file");
+
+ /* 비록 개방에 실패하더라도, 과거의 파일 모드를 복원한다. */
+ if (umask (oldu) == -1) 
+	 perror ("restoring old mask");
+
+ /* 파일 기술자를 복귀한다. */
+ return filedes;
+}
+```
+- 마스크를 0으로 바꾸면 그룹, 아더스의 라이트 설정 가능
+- 올드 마스크와 유마스크 값을 서로 바꿈
+- 모드를 777로 하면 설정이 된다.
+- 이후 올드 마스크와 뉴마스크를 다시 서로 바꾼다.
+
 ## The access(2) system call
+```c
+#include <unistd.h>
+
+int access(const char *pathname, int amode);
+
+//Returns: 0 if OK,-1 on error
+```
+- 실제(real) 사용자 및 그룹 ID를 기반으로 경로 이름(pathname)의 액세스(access) 권한(permissions)을 확인합니다.
+* Arguments(인자들)
+    - amode
+        + R_OK 읽기 권한에 대한 테스트.
+        + W_OK 쓰기 권한에 대한 테스트.
+        + X_OK 실행 권한에 대한 테스트.
+        + F_OK 파일 존재 여부에 대한 테스트
+
+![그림11](https://ji-hun-park.github.io/assets/images/그림56.jpg "그림11"){: .align-center}
+`<unistd.h>` 반드시 include  
+엑세스를 실행하는 프로세스에서 Real 유저(그룹) ID 기반으로 저 파일(pathname)에 대해 주어진 퍼미션(amode)이 있는지 없는지 물어봅니다.  
+R_OK 리드 퍼미션 있냐  
+W_OK 라이트 퍼미션 있냐  
+X_OK 엑스큐트 퍼미션 있냐  
+F_OK 파일 엑시스턴스(패스 네임 파일이 있냐)
+
 ### example
+```c
+/*access의 사용 예 */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+main()
+{
+  char *filename = "afile";
+
+  if (access (filename, R_OK) == -1)
+  {
+ 	fprintf (stderr, "User cannot read file %s\n", filename);
+	exit (1);
+  }
+ 
+ printf ("%s readable, proceeding\n", filename);
+
+  /* 프로그램의 나머지 부분... */
+}
+```
+이 프로그램을 실행하는 프로세스의 리얼 유저 아이디를 기준으로 `afile`이란 파일의 리드 퍼미션이 있는가를 체크합니다.
+
 ## The chmod(2) system call
-### The chmod(2) system call (1/2)
-### The chmod(2) system call (2/2)
+```c
+#include <unistd.h>
+
+int chmod(const char *pathname, mode_t newmode);
+
+//Returns: 0 if OK,-1 on error
+```
+기존 파일의 권한을 변경합니다.  
+파일 소유자 또는 슈퍼유저만 가능합니다.
+```c
+if( chmod(pathname, 0644) == -1 )
+    perror(“call to chmod failed”);
+```
+퍼미션을 바꾸는 시스템 콜입니다.($ chmod g+y test – 이거는 커멘드(1))
+
+`pathname`에 파일명 넣고, `newmode`에 문자는 안 들어가고 숫자만 들어갑니다.(옥탈(8진수) 넘버, 0으로 시작)  
+`newmode` 퍼미션으로 `pathname`의 퍼미션을 변경합니다.  
+권한은 이 프로세스를 실행하는 이펙티브(유효) 유저 아이디로 체크합니다.(파일의 오너와 같아야 한다)  
+슈퍼 유저면 무조건 바꿀 수 있습니다.
+
+## The chown(2) system call
+```c
+#include <unistd.h>
+
+int chown(const char *pathname, uid_t owner_id, gid_t group_id);
+
+
+//Returns: 0 if OK,-1 on error
+```
+- 파일의 사용자 ID와 파일의 그룹 ID를 변경할 수 있도록 합니다.
+- Arguments(인자들)
+    - owner_id : 새 소유자
+    - group_id : 새 그룹
+- 오류 **EPERM**은 파일의 소유권을 변경하려는 모든 불법적인(illegal) 시도에서 항상 return됩니다.
+- 해당 파일의 소유권이 변경되면 해당 파일에 대한 set-user-id 및 set-group-id 권한(permission)이 해제됩니다.
+- <span style="color:#0000FF">인자 owner_id 또는 group_id 중 하나가 -1이면 해당 ID는 변경되지 않습니다.</span>
+
+- 패스네임에 파일명, 오너 아이디에 바꾸고자 하는 오너 아이디, 그룹 아이디에 바꾸고자 하는 그룹 아이디를 넣음
+- 파일 유저와 그룹 오너를 바꿀 수 있다, 오너 아이디는 뉴 오너, 그룹 아이디는 뉴 그룹
+- 하나만 바꾸고 싶으면 나머지 하나에 –1을 넣으면 안 바뀐다
+- 자기가 소유한 파일만 오너를 바꿀 수 있다, 이 때 에러는 **EPERM**
+
+파일의 소유자를 바꿔주는 시스템 콜입니다.(커멘드도 있습니다.)  
+```c
+$ chown user2 test
+```
+- user2에게 test 파일의 오너를 넘겨준다(자신의 소유 파일만 가능)
+
+파일의 오너쉽이 바뀔 때 자동적으로 1이 0으로 턴오프(바뀐다)
+
+## set-user-id and set-group-id permission are turned off for a file when the ownership of that file is altered.
+스파이가 해킹 파일을 만들 때 체인지 오너(chown)에서 자동으로 rws를 rwx로 바꿔줘서 자정 작용을 합니다.  
+즉 파일의 오너가 바뀔 때 셋 유저아이디 온 엑스큐션 퍼미션을 자동으로 오프시켜줍니다.(도둑질 방지)
+
+> 권한이 s인 파일을 실행하면 유저 아이디가 super로 바뀌니까,  
+그 유저 아이디로 파일을 맘대로 보고 바꾸고 실행할 수 있음  
+심지어 체인지 오너(chown)로 파일의 소유권을 바꿀 수도 있으니 이를 방지함
+
 # 3.2 File with multiple names
 ## File System
 ### File System (1/2)
@@ -236,24 +483,14 @@ fd4 = open(“file5”, O_RDONLY);
 ## The rename(2) system call
 ## The symlink(2) system call
 ## The readlink(2) system call
-# 3.3 Obtaining file information: stat and fstat
+# 3.3 Obtaining file information: *stat* and *fstat*
 ## The stat(2) system call
 ### The stat(2) system call (1/2)
 ### The stat(2) system call (2/2)
 ### example
 ## 작성중
-![그림00](https://ji-hun-park.github.io/assets/images/image04.png "그림00"){: .align-center}
 
 
-
-
-
-
-![그림07](https://ji-hun-park.github.io/assets/images/그림52.jpg "그림07"){: .align-center}
-![그림08](https://ji-hun-park.github.io/assets/images/그림53.jpg "그림08"){: .align-center}
-![그림09](https://ji-hun-park.github.io/assets/images/그림54.jpg "그림09"){: .align-center}
-![그림10](https://ji-hun-park.github.io/assets/images/그림55.jpg "그림10"){: .align-center}
-![그림11](https://ji-hun-park.github.io/assets/images/그림56.jpg "그림11"){: .align-center}
 ![그림12](https://ji-hun-park.github.io/assets/images/그림57.jpg "그림12"){: .align-center}
 ![그림13](https://ji-hun-park.github.io/assets/images/그림58.jpg "그림13"){: .align-center}
 ![그림14](https://ji-hun-park.github.io/assets/images/그림59.jpg "그림14"){: .align-center}
