@@ -70,7 +70,27 @@ last_modified_at: 2025-02-08T20:00:00-23:59
 ### The stat(2) system call (2/2)
 ### example
 ## 작성중
-
+![그림00](https://ji-hun-park.github.io/assets/images/image04.png "그림00"){: .align-center}
+![그림01](https://ji-hun-park.github.io/assets/images/그림46.jpg "그림01"){: .align-center}
+![그림02](https://ji-hun-park.github.io/assets/images/그림47.jpg "그림02"){: .align-center}
+![그림03](https://ji-hun-park.github.io/assets/images/그림48.jpg "그림03"){: .align-center}
+![그림04](https://ji-hun-park.github.io/assets/images/그림49.jpg "그림04"){: .align-center}
+![그림05](https://ji-hun-park.github.io/assets/images/그림50.jpg "그림05"){: .align-center}
+![그림06](https://ji-hun-park.github.io/assets/images/그림51.jpg "그림06"){: .align-center}
+![그림07](https://ji-hun-park.github.io/assets/images/그림52.jpg "그림07"){: .align-center}
+![그림08](https://ji-hun-park.github.io/assets/images/그림53.jpg "그림08"){: .align-center}
+![그림09](https://ji-hun-park.github.io/assets/images/그림54.jpg "그림09"){: .align-center}
+![그림10](https://ji-hun-park.github.io/assets/images/그림55.jpg "그림10"){: .align-center}
+![그림11](https://ji-hun-park.github.io/assets/images/그림56.jpg "그림11"){: .align-center}
+![그림12](https://ji-hun-park.github.io/assets/images/그림57.jpg "그림12"){: .align-center}
+![그림13](https://ji-hun-park.github.io/assets/images/그림58.jpg "그림13"){: .align-center}
+![그림14](https://ji-hun-park.github.io/assets/images/그림59.jpg "그림14"){: .align-center}
+![그림15](https://ji-hun-park.github.io/assets/images/그림60.jpg "그림15"){: .align-center}
+![그림16](https://ji-hun-park.github.io/assets/images/그림61.jpg "그림16"){: .align-center}
+![그림17](https://ji-hun-park.github.io/assets/images/그림62.jpg "그림17"){: .align-center}
+![그림18](https://ji-hun-park.github.io/assets/images/그림63.jpg "그림18"){: .align-center}
+![그림19](https://ji-hun-park.github.io/assets/images/그림64.jpg "그림19"){: .align-center}
+![그림20](https://ji-hun-park.github.io/assets/images/그림65.jpg "그림20"){: .align-center}
 ## 마무리
 이상으로 Linux 이론의 파일2편을 마치겠습니다.  
 긴 글 읽어주셔서 감사합니다!
