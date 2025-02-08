@@ -114,8 +114,8 @@ uid는 2종류(리얼,이펙티브) - ruid, euid
 프로세스가 파일을 만들면 파일의 오너는 euid가 됩니다.(파일의 대한 권한은 전부 euid)  
 이펙티브 유저아이디(그룹아이디)가 파일의 엑세스 퍼미션(접근 권한)을 결정합니다.(그룹도 이펙티브가 중요!)
 
-쉘이 프로세스를 만들면 ruid,euid가 같아집니다.  
-쉘에서 패스워드(유저의 패스워드를 바꾸는 파일)라는 파일(/etc/shadow에 있고, 파일 오너는 루트, 루트만이 엑세스 가능)을 실행하면 euid가 0으로 바뀝니다(ruid는 그대로), 이 경우 두 아이디가 서로 달라집니다!
+셸이 프로세스를 만들면 ruid,euid가 같아집니다.  
+셸에서 패스워드(유저의 패스워드를 바꾸는 파일)라는 파일(/etc/shadow에 있고, 파일 오너는 루트, 루트만이 엑세스 가능)을 실행하면 euid가 0으로 바뀝니다(ruid는 그대로), 이 경우 두 아이디가 서로 달라집니다!
 
 ## Permissions and file modes
 ### Permissions and file modes (1/3)
@@ -733,17 +733,336 @@ int rename(const char *oldname, const char *newname);
 원래는 위에 [예제](https://ji-hun-park.github.io/linux/Linux-Theory-03/#example-3)처럼 코드를 짰으나 이런 기능을 자주 이용하다 보니 나중에 만들어 졌습니다.
 
 ## The symlink(2) system call
+```c
+#include <unistd.h>
+
+int symlink(const char *realname, const char *symname);
+
+//Returns: 0 if OK, -1 on error
+```
+- 심볼릭 링크 파일이 open으로 열린 적이 있다면 open 시스템 콜은 realname으로 가는 경로를 올바르게 따릅니다.
+- 프로그래머가 symname 자체에 보관된 데이터를 보고 싶다면 시스템 콜 readlink를 사용해야 합니다.
+
+symlink 시스템 콜(윈도우즈의 바로가기)  
+`unistd.h` include, int symlink(const char *realname, const char *symname); (0, -1 리턴)  
+하드 링크에서는 이름만 추가되지만 여기선 아예 새로운 파일이 추가됩니다.  
+리얼 네임의 앱솔루트(절대) 패스네임이 심볼릭 링크가 가리키는 파일 내용 안에 문자열로 들어갑니다.
+
+어떤 파일을 오픈하면 해당 파일을 가리키는 파일 디스크립터(서술자)가 오픈이 되는데,  
+심볼릭 링크 파일을 오픈하면 파일 디스크립터(서술자)가 심볼릭 링크 파일 자체가 아닌 심볼릭 링크가 간접적으로 가리키는 파일을 가리킵니다.  
+심볼 링크 파일 자체의 내용을 보고 싶으면 리드링크라는 시스템 콜을 사용해야 합니다.(아래 내용)
+
 ## The readlink(2) system call
+```c
+#include <unistd.h>
+
+ssize_t readlink(const char* sympath, char* buffer, size_t bufsize)
+ 
+//Returns: number of bytes read if OK, -1 on error
+```
+**readlink 시스템 콜**  
+1. sympath 열기
+2. 파일의 내용을 버퍼로 읽기
+3. sympath 닫기
+
+- 원본 파일이 제거되면 프로그램은 여전히 ​​심볼릭 링크를 '볼' 수는 있지만, open 호출은 그 안에 포함된 경로를 따라갈 수 없고 `errno`가 **EEXIST**로 설정된 상태로 반환(return)됩니다.
+
+`unistd.h`를 include한 다음,  
+ssize_t readlink(const char* sympath, char* buffer, size_t bufsize) 성공하면 오픈, 실패하면 –1 리턴
+
+sympath 부분에 심볼 링크만 들어갈 수 있습니다.  
+기존 리드처럼 버퍼와 사이즈가 있습니다.  
+심볼릭 링크 파일을 열고, 메모리 버퍼 안에 파일 내용을 읽어들이고, 파일을 닫습니다.
+
+버프 사이즈가 충분히 커야 합니다.  
+리턴 값은 실제로 읽어들인 숨은 캐릭터 문자열 문자 개수입니다.
+```
+dangled reference – 원본 파일이 삭제된다면?
+심볼 링크 파일 자체를 리드링크로 여는 것은 여전히 가능하나 심볼 링크를 오픈하면 파일이 존재하지 않는다는 에러 넘버가 뜬다.
+```
+
 # 3.3 Obtaining file information: *stat* and *fstat*
+파일 시스템에선 어떤 파일이 있으면 데이터 블록에 파일들이 쭉 있습니다.  
+이런 파일에 대해 i-노드 블록 안에 한 개의 i-노드가 1 대 1로 대응합니다.  
+i-노드 안에 해당 파일이 데이터 볼록의 어디에 있는지 정보가 있습니다.  
+디렉토리도 i-노드를 가리킵니다(하드 링크).  
+i-노드에 파일명을 제외한 모든 파일 정보가 들어있습니다.  
+이 i-노드 안에 정보들을 보는 시스템 콜이 *stat*과 *fstat*입니다.
+
 ## The stat(2) system call
 ### The stat(2) system call (1/2)
+```c
+#include <sys/stat.h>
+
+int stat(const char *pathname, struct stat *buf);
+
+int fstat(int filedes, struct stat *buf);
+
+int lstat(const char *pathname, struct stat *buf);
+
+
+ 
+//All three return: 0 if OK, -1 on error
+```
+- 이 함수는 파일에 대한 정보를 얻습니다.
+    - stat : 명명된 파일
+    - fstat : 열린 파일
+    - lstat : 심볼릭 링크
+
+스탓(stat) 시스템 콜은 파일 i-노드의 자세한 정보를 보는 시스템 콜
+
+스탓 첫 아규먼트는 보고자 하는 파일명입니다.  
+해당 파일이 하드 링크하고있는 i-노드의 정보가 두 번째 인자인 버퍼 안에 들어옵니다.(버퍼 구조는 struct stat, pointer)
+
+fstat은 스탓과 거의 비슷한데, 파일을 오픈해서 fd를 넣어주는 것이 차이입니다.  
+fstat은 unnamed pipe혹은 socket과 같은 파일에 대한 정보를 얻을 때 유용합니다.
+
+lstat은 l이 심볼릭 링크를 의미하며, 패스네임에 심볼릭 링크만 들어갑니다.(following되지 않습니다.)  
+일반 스탓에 심볼릭 링크 파일을 넣으면 그 심볼 링크가 가리키는 파일 정보(following)가 버퍼에 들어옵니다.  
+flstat이 없는 이유는 symlink를 open하면 무조건 following되기 때문입니다.
+
 ### The stat(2) system call (2/2)
-### example
-## 작성중
+>Argument
+>>buf
+
+```c
+struct stat {
+       mode_t    st_mode;    /* file type & mode (permissions) */
+       ino_t     st_ino;     /* i-node number (serial number) */
+       dev_t     st_dev;     /* device number (file system) */
+       dev_t     st_rdev;    /* device number for special files */
+       nlink_t   st_nlink;   /* number of links */
+       uid_t     st_uid;     /* user ID of owner */
+       gid_t     st_gid;     /* group ID of owner */
+       off_t     st_size;    /* size in bytes, for regular files */
+       time_t    st_atime;   /* time of last access */
+       time_t    st_mtime;   /* time of last modification */
+       time_t    st_ctime;   /* time of last file status change */
+       blksize_t st_blksize; /* best I/O block size */
+       blkcnt_t  st_blocks;  /* number of disk blocks allocated */
+     };
+```
+- stat은 status(스테이터스, 상태)의 약자, 두 번째 아규먼트인 버퍼(buf)는 struct stat *pointer인데, 그게 해당 표의 i-노드에 들어있는 정보들을 변수로 표현한 것
+- st_mode – 파일 타입과 퍼미션 정보 mode_t는 unsigned short로 2바이트(16비트), 파일 타입 4비트에 파일 모드 12비트(sgtrwxrwxrwx)
+- st_ino – i-노드 넘버(시리얼 넘버)
+- st_dev (dev_t) - 마운트한 파일시스템을 유니크하게 식별하는 번호, 디바이스 넘버(파일이 디스크에만 있는 것이 아님(USB,테이프 등), 어떤 장치에 해당 파일이 있는지에 관한 정보를 나타냄)
+    - st_dev와 st_ino의 combination(조합)은 i-node를 유일하게 식별한다.
+    - device ID는 major와 minor번호로 나뉨, major는 driver를 나타내고, minor는 device를 나타냄
+- st_rdev : spercial file이 가리키는 device의 number
+
+예를 들어 special file인 /dev/ad0s1g는 root 파일 시스템에 있습니다.  
+따라서, st_dev는 root 파일 시스템의 디바이스 번호입니다.  
+반면, st_rdev는 /dev/ads1g가 가리키는 장치번호입니다.
+
+- st_nlink – 링크 카운트
+- st_uid – 파일의 오너
+- st_gid – 오너가 속한 그룹 아이디
+- st_size
+    - regular file에 대해 이것은 data size를 가리킨다.(파일 안 바이트 수)
+    - shared memory : memory size
+    - pipe : the amount of data in the pipe., 즉, 안 읽은 data의 양
+- st_atime – 파일을 어떤 프로세스가 엑세스 했을 때, 가장 최근에 엑세스한(accessed) 시간
+- st_mtime – 가장 최근에 파일의 컨텐츠가 수정된(modified) 시간
+- st_ctime – 가장 최근에 파일의 스테이터스(i-노드 정보)가 수정된 시간
+- st_blksize – 파일의 최고 I/O 블록 사이즈
+- st_blocks – 할당된 디스크 블록 개수
+
+### example (1/3)
+```c
+/* filedata -- 한 파일에 관한 정보를 출력 */
+
+#include <stdio.h>
+#include <sys/stat.h>
+
+/* 허가 비트가 설정되어 있는지 결정하기 위해 octarray를 사용 */
+static short octarray[9] = {	0400, 0200, 0100,	
+				0040, 0020, 0010,
+				0004, 0002, 0001};
+
+/* 파일 허가에 대한 기호화 코드 끝부분의 null 때문에 길이가 10문자이다. */
+static char perms[10] = "rwxrwxrwx";
+
+int filedata (const char *pathname)
+{
+ struct stat statbuf;
+ char descrip[10];
+ int j;
+
+ if(stat (pathname, &statbuf) == -1)
+ {
+	 fprintf (stderr, "Couldn't stat %s\n", pathname);
+	 return (-1);
+ }
+
+/* 허가를 읽기 가능한 형태로 바꾼다. */
+
+ for(j=0; j<9; j++)
+ {
+	 /* 비트별 AND를 사용하여 허가가 설정되었는지 테스트 */
+	 if (statbuf.st_mode & octarray[j])
+		 descrip[j] = perms[j];
+	 else
+		 descrip[j] = '-';
+ }
+
+ descrip[9] = '\0'; /* 하나의 문자열을 가지도록 확인 */
+
+ /* 파일 정보를 출력한다. */
+
+ printf ("\nFile %s :\n", pathname);
+ printf ("Size %ld bytes\n", statbuf.st_size);
+ printf ("User-id %d, Group-id %d\n\n", statbuf.st_uid, statbuf.st_gid);
+ printf ("Permissions: %s\n", descrip);
+ return (0);
+}
+```
 ![그림17](https://ji-hun-park.github.io/assets/images/그림62.jpg "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/그림63.jpg "그림18"){: .align-center}
+메인(main) 펑션(function, 함수)에서 파일 데이터를 불러주는데, 구체적인 패스네임(경로명)을 불러줘서 그 패스네임 파일에 대한 퍼미션(권한) 정보를 문자열(char*)로 출력해주는 프로그램입니다.
+
+octarray(옥탈어레이)[9]는 [0]부터 [8]까지 첫 줄 0 1 2 둘째 줄 3 4 5 셋째 줄 6 7 8 이렇게 대응합니다.  
+밑에 퍼미션은 0~8로 대응(null까지해서 10문자)합니다.
+
+statbuf(스탓버퍼)의 st_mode에 퍼미션(권한) 정보가 있으니, 이와 비교해서 대응되는 위치에 값을 넣어 출력합니다.  
+octarray가 위 이미지 하단 우측의 0~8에 해당하는 비트입니다.  
+perms는 그 좌측의 퍼미션 별 인덱스입니다.
+
+비트와이즈앤드(&)로 0부터 시작해서 차례 차례 비교하며, 밑에 표에 해당하는 위치에 집어 넣습니다.  
+권한 있으면 해당 문자를 넣고, 없으면 –를 넣습니다.(descrip[j]에)
+
+파일명은 패스 네임을 넣어 출력합니다.  
+total size는 statbuf의 st_size에 있으니 출력하고,  
+유저 아이디, 그룹 아이디도 statbuf에 있으니 출력하고,  
+위에서 저장한 퍼미션 정보도 출력해줍니다.
+
+### example (2/3)
+```c
+/* lookout -- 파일이 변경될 때 메시지를 프린트 */
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#define MFILE    10
+
+void cmp(const char *, time_t);
+struct stat sb;
+
+main (int argc, char **argv)
+{
+   int j;
+   time_t last_time[MFILE+1];
+
+   if(argc < 2){
+      fprintf (stderr, "usage: lookout filename ...\n");
+      exit (1);
+   }
+
+   if(――argc > MFILE){
+      fprintf (stderr, "lookout: too many filenames\n");
+      exit (1);
+   }
+
+   for (j=1; j<=argc; j++){	/* 초기화 */
+      if (stat (argv[j], &sb) == -1){
+         fprintf (stderr, "lookout: couldn't stat %s\n", argv[j]);
+         exit (1);
+      }
+      last_time[j] = sb.st_mtime;
+   }
+
+   for (;;){			/* 파일이 변경될 때까지 루프 */
+      for (j=1; j<=argc; j++)
+         cmp (argv[j], last_time[j]);
+
+        /* 60초간 쉰다. “sleep"은 표준 UNIX 라이브러리 루틴이다. */
+      sleep (60);
+   }
+}
+
+void cmp(const char *name, time_t last){
+   /* 파일에 관한 통계를 읽을 수 있는 한 변경시간을 검사한다. */
+   if (stat(name, &sb) == ―1 || sb.st_mtime != last){
+      fprintf (stderr, "lookout: %s changed\n", name);
+      exit (0);
+   }
+}
+```
 ![그림19](https://ji-hun-park.github.io/assets/images/그림64.jpg "그림19"){: .align-center}
 ![그림20](https://ji-hun-park.github.io/assets/images/그림65.jpg "그림20"){: .align-center}
+파일명은 최대 10개까지 허용(MFILE이 10)합니다.  
+이 파일들의 변경 사항이 있으면 변경 내용을 출력해주는 프로그램입니다.
+
+위에 cmp는 비교해서 변경 내용이 있는지 알아보는 펑션(함수)의 프로토타입입니다.  
+만약 셸 입력이 a.out test1, test2 일 때,  
+argc는 3이 되고 argv[0]는 a.out이라는 문자열에 대한 포인터, 나머지도 마찬가지입니다.
+
+argc가 2보다 작다는 것은 1이라는 것(아규먼트(인자)가 없다)이므로 exit합니다.  
+argc에서 하나 빼면 아규먼트(인자) 개수인데, 이게 10보다 크면 너무 많으므로 에러처리합니다.  
+argc를 아까 하나 빼줘서 현재는 아규먼트 개수인 상태입니다.
+
+for문으로 아규먼트(인자) 개수만큼 루프(loop)를 돕니다.  
+sb(statbuffer)에 test1에 대한 i-노드 정보가 들어옵니다.  
+st_mtime(파일의 내용이 변경된 가장 최근 시간)을 last_time array(어레이, 배열)에 저장합니다.
+
+무한 루프를 도는데, 그 안에서 아규먼트 개수만큼 루프를 돕니다.  
+마지막 시간에서 변경된 게 있는지 체크합니다.  
+sleep(60)(60초 간격으로 실행합니다).  
+바뀐게 있으면 출력하고 끝냅니다.
+
+*name에 argv[j]가 들어가고, last에 last_time 어레이가 들어갑니다.  
+그리고 stat을 한 번 더 해줍니다.
+
+새로 나온 i-노드 정보의 mtime이 마지막 시간과 다르다면,  
+마지막으로 바뀐 것에서 또 바뀐 것이니, 바뀌었다는 메시지 출력후 끝냅니다.
+
+어떤 명령을 조건식에 넣고서 로지컬(논리적) 오어(||)하면,  
+우선 어떤 커멘드(명령)가 정상적으로 실행되면 0이, 실패하면 –1이 리턴되는데, 이 값을 ==이나 !=으로 boolean 값으로 변경해 줍니다.  
+이 때 오어는 하나라도 true면 true기 때문에 앞에게 true면 뒤에 것은 실행하지 않습니다.  
+즉, 첫 번째가 false일 때만 두 번째 것을 실행합니다.
+
+여기서 stat이 실패하는 경우는 파일이 삭제된 경우이므로 변경된 경우에 해당합니다.
+
+### example (3/3)
+```c
+/* addx -- 파일에 수행허가를 추가 */
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#define XPERM  0100       / *  소유자에 대한 수행 허가 */
+
+main(int argc, char **argv){
+   int k;
+   struct stat statbuf;
+
+   for (k=1; k<argc; k++){/* 인수 리스트의 모든 파일에 대해 루프 */
+      /* 현행 파일 모드를 얻음 */
+      if (stat (argv[k], &statbuf) == -1){
+         fprintf (stderr, "addx: couldn't stat %s\n", argv[k]);
+         continue;
+      }
+
+      /* 비트별 OR 연산을 사용하여 수행허가의 추가를 시도 */
+      statbuf.st_mode |= XPERM; //statbuf.st_mode = statbuf.st_mode + XPERM; 
+      if (chmod (argv[k], statbuf.st_mode) == -1)
+         fprintf (stderr, "addx: couldn't change mode for %s\n", argv[k]);
+
+   } /* 루프의 끝 */
+}
+```
+퍼미션(권한)을 추가해주는 프로그램입니다.
+
+XPERM 0100은 유저의 X퍼미션(실행권한)입니다.  
+인자 리스트의 모든 파일에 대해 chmod u+x test(mode(권한)에 유저의 실행 권한 추가)를 실행하라는 의미입니다.
+
+아규먼트(인자)의 개수만큼 반복합니다.  
+K번째 아규먼트는 파일명이고 이걸 stat으로 정보를 받아옵니다, 실패하면 continue로 다음 걸로 넘어갑니다.  
+성공하면 정보를 가져왔으니 그 안에 st_mode에다 XPERM을 비트와이즈오어(|)해서 권한 추가를 시도합니다.
+
+여기서 |= 과 += 은 같은 역할입니다.  
+성공했으면 체인지모드(chmod)를 통해 바뀐 st_mode로 퍼미션을 변경합니다.  
+실패하면 오류 메시지를 출력합니다.
+
 ## 마무리
 이상으로 Linux 이론의 파일2편을 마치겠습니다.  
 긴 글 읽어주셔서 감사합니다!
