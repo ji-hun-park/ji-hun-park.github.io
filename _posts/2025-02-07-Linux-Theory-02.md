@@ -1074,21 +1074,105 @@ errno(에러 넘버, 시스템에서 중요한 변수)
 즉, 에러 넘버는 시스템 콜이 실패했을 때 즉시 확인해야 합니다(에러 넘버는 가장 최근의 에러 타입을 저장하기 떄문에).
 
 에러 넘버는 global accessible integer(전역 접근 가능 정수 변수), POSIX는 extern(익스턴, global로 선언) int errno;로 정의, `errno.h`에 있습니다.  
-에러 넘버는 오류가 발생하지 않으면 시스템 콜을 실행했을 때 리셋(재설정)되지 않습니다.  
+`에러 넘버는 새로운 오류가 발생하지 않으면 시스템 콜을 실행했을 때 리셋(재설정)되지 않습니다.`  
 시스템이 실패했을 시 즉각적으로 에러넘버 값을 확인해야 합니다.
 
 ## Error Handling (2/3)
-![그림19](https://ji-hun-park.github.io/assets/images/그림42.jpg "그림19"){: .align-center}
+```c
+#include <string.h> 
 
+char *strerror(int errnum); 
+```
+```c
+#include <stdio.h>
+
+void perror(const char *msg);
+```
+```c
+#include <stdio.h>           /* err1.c ― 에러 취급을 감안하여 파일을 개방하라. */
+#include <fcntl.h>
+#include <errno.h>     //errno is defined
+
+void main(int argc, char** argv)
+{
+    int fd;
+
+    if ( (fd = open ("nonesuch", O_RDONLY)) == -1)
+        fprintf(stderr, "ENOENT: %s\n", strerror(errno));
+    
+    errno = EACESS;
+    perror(argv[0]);
+}
+```
+![그림19](https://ji-hun-park.github.io/assets/images/그림42.jpg "그림19"){: .align-center}
+`string.h`에 미리 준비되어 있는 `strerror`라는 라이브러리 펑션(함수)이 있는데,  
+`#define`으로 정의되어 있는 `E`로 시작하는 니머닉(에러 넘버, 숫자), 설명문이 있습니다.  
+여기에 에러넘버를 넣으면 설명해주는 문장을 리턴해 줍니다.
+
+perror(피에러) - 리드 온리로 존재하지 않는 파일을 오픈해도 에러, 퍼미션이 없어도 에러(EACESS or ENOENT) 발생  
+이 경우 에러 넘버가 시스템이 알아서 자동으로 세팅 합니다(우리가 알 필요 없이).  
+스트링 에러(strerror)가 에러 넘버를 문장으로 바꿔주고, 그걸 fprintf로 출력합니다.
+
+- `argc`는 실행 프로그램 아규먼트(인자) 합친 수
+- `argv[0]`는 a.out(자기 실행 프로그램 명)의 문자열에 관한 포인터
+    - 1은 두 번째인 arg1 문자열에 대한 포인터, 2는 세 번째인 arg2 문자열에 대한 포인터
+- 피에러(perror)라는 펑션(함수)은 해당 문자열을 출력해주고, 에러 메시지 출력
 
 ## Error Handling (3/3)
-![그림20](https://ji-hun-park.github.io/assets/images/그림43.jpg "그림20"){: .align-center}
+```c
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h> //이것만 include하면 errno가 extern으로 지정
 
+main()
+{
+    int fd;
+
+    fd = open(“nonesuch”, O_RDONLY); //error, errno = ENOENT
+    fprintf(stderr, "error %d\n", errno); 
+    perror(“first position”);
+    fd = open(“existfile”, O_RDONLY); //error, errno = EACESS
+    fprintf(stderr, "error %d\n", errno); 
+    perror(“second Position”);
+}
+```
+![그림20](https://ji-hun-park.github.io/assets/images/그림43.jpg "그림20"){: .align-center}
+>stdio.h – fprintf / errno.h – errno, perror / fcntl.h – open
+
+`errno.h`만 include하면 에러넘버가 자동으로 익스턴(extern, global)으로 지정이 되어있습니다.  
+`nonesuch`라는 파일을 리드온리로 오픈하려는데 실패하면 에러넘버는 ENOENT가 됩니다.  
+에러 넘버 fprintf로 출력해보면 2가 출력됩니다.
+
+피에러(perror)로 문자열 `first position`을 주면 그 문자열이 그대로 출력되고, 최근 에러 메시지를 출력합니다.  
+`existfile`이라는 파일을 오픈하는데 실패 -> 리드 퍼미션이 없음, 에러넘버는 EACESS  
+에러넘버를 출력해보면 3이 출력 됩니다.
+
+피에러를 실행하면 준 문자열과 에러 넘버에 해당하는 문자열이 출력 됩니다.(strerr, errno)  
+피에러에 있는 문자열로 에러가 발생한 위치를 파악할 수 있습니다.
 
 ## Error Handling: Wrapper Functions
+```c
+void err_sys(char* msg){
+    perror(msg);
+    exit(1);
+}
+```
+```c
+void Close(int fd)
+{
+	if (close(fd) == -1)
+		err_sys("close error");
+}
 
-
-## 작성중
+pid_t Fork(void)
+{	pid_t	pid;	
+	if ( (pid = fork()) == -1)		
+		err_sys("fork error");	
+	return(pid);
+}
+```
+- 오류로 인해 종료되는 것이 일반적인 경우이므로
+    - 래퍼 함수(wrapper function)를 ​​정의하여 프로그램을 단축할 수 있습니다.
 
 ## 마무리
 이상으로 Linux 이론의 파일1편을 마치겠습니다.  
