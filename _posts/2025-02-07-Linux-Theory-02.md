@@ -853,16 +853,240 @@ int main()
 }
 ```
 ![그림16](https://ji-hun-park.github.io/assets/images/그림45.jpg "그림16"){: .align-center}
+파일 서술자 0, 1을 오픈하지 않아도 리드, 라이트가 가능합니다.
+
+`< infile(파일명)`은 키보드 입력, Standard Input(스탠다드 인풋, 표준 입력)을 파일로 리다이렉션(Redirection, 방향 변경)합니다.  
+dup2 infile,0로 키보드를 가리키는 fd가 infile(fd 변수 이름, 3)을 가리키게 바꿔줍니다.  
+프로그램은 그것도 모르고 바보같이 파일에서 읽어들입니다!  
+이것이 바로 `Input Redirection(인풋 리디렉션, 입력 리디렉션)`입니다!
 
 ### Redirection (2/3)
+![그림17](https://ji-hun-park.github.io/assets/images/그림40.jpg "그림17"){: .align-center}
+write(1,buffer,n) - 버퍼에 있는 내용을 N바이트만큼 스크린에 라이트합니다.  
+좌 파일명, 우 변수명, `> 파일명`으로 output(아웃풋, 출력)합니다.  
+리다이렉션 명령을 쉘이 사전적으로 수행합니다.  
+전에는 standard output(스탠다드 아웃풋, 표준 출력), 스크린(모니터)을 가리키고 있던 fd 1번이 overwrite(오버라이트, 덮어쓰기)되면서 파일을 가리키게 됩니다!  
+프로그램은 바뀐 줄도 모르고 멍청하게 실행해서 `screen(스크린, 화면)`으로 나오는게 아닌 `outfile`로 나오게 만듭니다!  
+이것이 바로 `Output Redirection(아웃풋 리디렉션, 출력 리디렉션)`입니다!
 
 ### Redirection (3/3)
+```c
+prog_name < infile > outfile
+```
+(<>는 delimiter(딜리미터, 구획 문자))이렇게하면 인 리다이렉션과 아웃 리다이렉션을 동시에 할 수 있습니다! 해석은 쉘이 합니다.  
+- infile에서 읽어들여 outfile로 보내기
+
+## io example
+```c
+#include <stdlib.h>
+#include <unistd.h>
+
+#define SIZE 512
+
+main()
+{
+  ssize_t nread;
+  char buf[SIZE];
+  
+  while ( (nread = read (0, buf, SIZE)) > 0)
+     write (1, buf, nread);
+  exit (0);
+}
+```
+```c
+$io
+This is line 1 ↓
+This is line 1
+This is line 2 ↓
+This is line 2
+<Ctrl-D>
+$
+```
+- 각 줄은 Return 키를 누르면 출력됩니다.
+- 이는 터미널에서 데이터를 받는 데 사용되는 read가 일반적으로 각 줄바꿈 문자 다음에 반환(return)되기 때문입니다.
+
+`stdlib.h`(스탠다드립)은 exit, `unistd.h`(유니스트드)는 ssize_t를 위해 필요합니다.  
+0,1은 오픈할 필요가 없습니다!
+
+리턴 다음 널캐릭터(NULL) 포함 16자를 리턴하고, 라이트로 버퍼에 있는 값을 보여줍니다  
+입력값이 0보다 크면 반복합니다.  
+컨트롤(Ctrl)과 D를 동시에 누르면 엔드오브파일(EOF)이 되면서 0이 리턴되어 프로그램이 종료됩니다.
+
+# 2.3 The Standard I/O Library: a look ahead
+스탠다드 아이/오 라이브러리는 시스템 콜은 아닙니다.  
+그러나 라이브러리에 있는 명령어들의 내용을 보면 입력과 관련된 것 들은 다 read를 사용합니다.
+
+## The Standard I/O Library (1/3)
+### UNIX I/O (system call)
+유닉스 입출력 시스템 콜(리드, 라이트, 오픈)은 간단한 시퀀스의 바이트를 처리합니다.  
+프로그래머에게 복잡한 많은 것은 스탠다드 아이/오로 남겨뒀습니다.  
+Efficiency(이피션시, 효율성) 고려는 Developer(디벨롭퍼, 개발자)가 알아서 해야합니다.
+### Standard I/O
+표준 입출력 – 자체 자동 메모리 버퍼가 있습니다.  
+사용자에게 친숙한 인터페이스로 좀 더 쓰기 좋습니다.  
+라이브러리를 사용하기 쉽게 합니다.  
+프로그래머는 이피션시(효율성)를 걱정할 필요가 없어집니다.
+
+## The Standard I/O Library (2/3)
+### Difference between Standard I/O and UNIX I/O
+- 파일이 서술되는 방식
+    - FILE*(파일 포인터) 또는 파일 서술자
+
+### Standard I/O routines are written around the system call primitives
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+main()
+{
+ 	FILE *stream;
+
+ 	if ( ( stream = fopen ("junk", "r")) == NULL)
+ 	{
+ 	   printf ("Could not open file junk\n");
+ 	   exit (1);
+ 	}
+}
+```
+- predefined file pointer(사전 정의된 파일 포인터)
+    - stdin  표준 입력
+    - stdout  표준 출력
+    - stderr  표준 오류
+
+#### 설명
+- fd대신 파일 포인터 사용
+- open은 시스템 콜
+- fopen은 라이브러리
+- fopen은 리드온리 등등이 아닌 r,w,a 등 리모닉한 걸 쓴다
+- 리턴(return, 반환)되는 것은 fd가 아닌 `파일의 포인터`다
+
+## The Standard I/O Library (3/3)
+C 표준 라이브러리(libc.a)에는 상위 수준(higher-level) 표준 I/O 함수 컬렉션이 포함되어 있습니다.  
+libc.a를 사용할 것입니다(getc,printf)
+
+- 표준(Standard) I/O 함수(Function)의 예:
+    - 파일 열기 및 닫기(fopen 및 fclose)
+    - 바이트 읽기 및 쓰기(fread 및 fwrite)
+    - 텍스트 줄 읽기 및 쓰기(fgets 및 fputs)
+    - 포맷된 읽기 및 쓰기(fscanf 및 fprintf)
+
+>fopen, fclose – 시스템 콜이 아닌 라이브러리(파일 포인터 리턴)  
+fread, fwrite(리드, 라이트), fgets, fputs(스트링 리드, 스트링 라이트)  
+포맷티드 리딩과 포맷티드 라이팅(fscanf, fprintf) - 파일에 스캔,프린트
+
+## fopen(3)
+*앞에서 말했듯 (3)은 라이브러리
+```c
+#include <stdio.h>
+
+FILE *fopen(const char *restrict pathname, const char *restrict type);
+
+//All three return: file pointer if OK, NULL on error
+```
+- Arguments(인자들)
+    - type:
+        - r or rb &nbsp;&nbsp;&nbsp;&nbsp; 읽기 위해 열기  
+        - w or wb	&nbsp;&nbsp;&nbsp;&nbsp; 0 길이로 자르거나 쓰기 위해 만들기  
+        - a or ab	&nbsp;&nbsp;&nbsp;&nbsp; append; 파일 끝에서 쓰기 위해 열기, 또는 쓰기 위해 만들기  
+        - r+ or r+b or rb+ &nbsp;&nbsp;&nbsp;&nbsp; 읽기 및 쓰기 위해 열기  
+        - w+ or w+b or wb+ &nbsp;&nbsp;&nbsp;&nbsp; 0 길이로 자르거나 읽기 및 쓰기 위해 만들기  
+        - a+ or a+b or ab+ &nbsp;&nbsp;&nbsp;&nbsp; 파일 끝에서 읽기 및 쓰기 위해 열기 또는 만들기
 
 
-![그림17](https://ji-hun-park.github.io/assets/images/그림40.jpg "그림17"){: .align-center}
+- fopen 리턴 값은 파일의 포인터, 캐릭터 타입 포인터이므로 `type`은 문자열로 들어감
+- 실패하면 NULL이 리턴된다
+- rb에서 b는 바이트
+- 아규먼트(인자)에 관한 자세한 내용은 susv4(싱글 유닉스 스페시피케이션 버젼 4) 참조
+
+## getc(3), putc(3)
+```c
+#include <stdio.h>
+
+int getc(FILE *istream);
+
+//Return: next character if OK, EOF on end of file or error
+
+
+int putc(int c, FILE *ostream); 
+
+//Return: c if OK, EOF on error
+```
+```c
+int c;
+FILE *istream, *ostream;
+
+/* istream을 읽기전용으로 개방하고, ostream을 쓰기전용으로 개방하라. */
+.
+.
+.
+while( ( c=getc(istream)) !=EOF)  //EOF defined in <stdio.h>, -1
+        putc(c, ostream);
+```
+
+## Buffering
 ![그림18](https://ji-hun-park.github.io/assets/images/그림41.jpg "그림18"){: .align-center}
+- 표준 I/O는 우아한 버퍼링 메커니즘을 통해 이러한 비효율성을 피합니다.
+- 사용되는 버퍼는 일반적으로 스트림에서 I/O가 처음 수행될 때 malloc을 호출하는 표준 I/O 함수 중 하나에서 얻습니다.
+
+>밑이 커널 위가 유저 인터페이스  
+커널 밑에 버퍼 캐쉬가 있다(디스크같은 블록 디바이스의 4K바이트 채우기)  
+라이브러리는 유저 메모리 단계에서 메모리 버퍼 메커니즘을 씀(시스템 콜을 적게 부르기 위해)  
+표준 아이/오는 비효율성을 피한다(우아한 버퍼링 메커니즘을 통해)  
+메모리 안에 있는 버퍼를 확보할 때는 malloc이라는 시스템 콜 사용
+
+## Writing error message with fprintf(3)
+```c
+#include <stdio.h> 
+
+int fprintf(FILE *restrict fp, const char   *restrict format, ...); 
+
+
+//Return: number of characters output if OK, negative value if output error
+```
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int notfound (const char *progname, const char *filename)
+{
+    fprintf (stderr, "%s: file %s not found\n", progname, filename);
+    exit (1);
+}
+```
+“restrict”(제한)은 동일한 주소가 사용되는 것을 방지합니다.
+
+fprintfile을 대신해서 씁니다.  
+리스트릭트가 붙은 것들 끼리는 서로 메모리를 공유하면 안 됩니다!
+
+# 2.4 The errno variable and system calls
+errno(에러 넘버, 시스템에서 중요한 변수)
+
+## Error Handling (1/3)
+에러 핸들링(시스템 차원에서)
+
+커널에 있는 시스템 콜을 부를 때 오류(Error)가 발생하면 –1을 리턴, 성공하면 0이나 필요한 값들을 리턴합니다.  
+-1은 어떤 이유로 실패했는지 알려주지 않습니다.  
+시스템 콜이 어떠한 이유로 실패했는지 자세히 알려주는 글로벌 변수가 세팅되어 있습니다.(`errno.h` include하면 `errno`라는 전역 변수(global)에서 미리 정해놓은 상수 값을 세팅해줍니다.)
+
+헤더 파일을 보면 문자 `E`로 시작하는 `상수`들이 `#define`으로 쭉 나열되어 있습니다.  
+시스템 콜에서 –1이 리턴되면 즉각 errno가 세팅 됩니다.  
+이후 다시 –1이 리턴되면 다시 에러넘버가 세팅이 되고, 이후에 시스템 콜이 성공하면 에러 넘버가 그대로 세팅 됩니다.  
+즉, 에러 넘버는 시스템 콜이 실패했을 때 즉시 확인해야 합니다(에러 넘버는 가장 최근의 에러 타입을 저장하기 떄문에).
+
+에러 넘버는 global accessible integer(전역 접근 가능 정수 변수), POSIX는 extern(익스턴, global로 선언) int errno;로 정의, `errno.h`에 있습니다.  
+에러 넘버는 오류가 발생하지 않으면 시스템 콜을 실행했을 때 리셋(재설정)되지 않습니다.  
+시스템이 실패했을 시 즉각적으로 에러넘버 값을 확인해야 합니다.
+
+## Error Handling (2/3)
 ![그림19](https://ji-hun-park.github.io/assets/images/그림42.jpg "그림19"){: .align-center}
+
+
+## Error Handling (3/3)
 ![그림20](https://ji-hun-park.github.io/assets/images/그림43.jpg "그림20"){: .align-center}
+
+
+## Error Handling: Wrapper Functions
+
 
 ## 작성중
 
