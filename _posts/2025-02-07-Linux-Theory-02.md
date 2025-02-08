@@ -1,6 +1,6 @@
 ﻿---
 title:  "Linux 기초 이론 02 FILE1"
-excerpt: "Linux 기초 이론 두번째 페이지"
+excerpt: "Linux 기초 이론 두 번째 페이지"
 toc_label: "목차"
 categories:
   - Linux

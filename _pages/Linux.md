@@ -6,4 +6,4 @@ author_profile: true
 taxonomy: Linux
 ---
 
-Linux 관련 글들 모음입니다.
+Linux 강의 관련 글들 모음입니다.
