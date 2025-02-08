@@ -614,9 +614,124 @@ link(“/usr/keith/chap.2”, “/usr/ben/2.chap”);
 둘 중 밑의 코드는 사용 예
 
 ## The unlink(2) system call
+![그림16](https://ji-hun-park.github.io/assets/images/그림66.jpg "그림16"){: .align-center}
+```c
+#include <unistd.h>
+
+int unlink(const char *pathname);
+
+//Returns: 0 if OK, -1 on error
+```
+- 기존 디렉토리 항목 제거(링크 삭제)할 때 사용
+    - 삭제하고자 하는 패스 네임만 넣으면 된다.
+    - 그 이름이 디렉토리에서 제거됨
+- 명명된 링크만 제거하고 파일의 링크 수를 하나 줄임
+- 파일에 대한 다른 링크가 있는 경우 파일의 데이터는 다른 링크를 통해 계속 액세스할 수 있습니다.
+- 링크 수가 0으로 감소하면 디스크 블록이 사용 가능한 블록 목록에 추가됩니다.
+
+name2라는 엔트리를 지우면 자동적으로 링크가 사라집니다.(i-노드 링크 카운트 1 감소)  
+이름을 i-노드 정보와 함께 삭제하는 것에 불과합니다.
+
+어떠한 i-노드의 존재 의의가 있으려면 링크 카운트가 적어도 하나는 있어야 합니다.  
+그런데 언링크를 계속하다보면 i-노드의 링크 카운트가 0이 될 때가 있습니다.  
+이럴 경우 엑세스 불가(이름이 없기에)하고 의미가 없기 때문에 삭제 됩니다.  
+i-노드는 프리(free) i-노드가 되고, i-노드가 가리키는 블록의 데이터 들은 empty가 됩니다.(클리어)  
+디스크 블록 안에 추가된 리스트들은 프리(free) 블록안에 들어가게 됩니다.
+
+- 링크 해제 권한?
+    - 언링크 퍼미션은 라이트 퍼미션이 필요함
+
 ### example
+```c
+/* move -- 한 파일을 하나의 경로이름으로부터 다른 경로이름으로 옮긴다. */
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
+char *usage = "usage: move file1 file2\n";
+
+/* main은 명령줄에 의해 표준적인 방법으로 전달된 인수를 사용한다. */
+main (int argc, char **argv){
+ if (argc != 3){
+         fprintf (stderr, usage); exit (1);
+ }
+
+ if ( link (argv[1], argv[2]) == -1){
+ 	perror ("link failed");
+ 	exit (1);
+ }
+
+ if ( unlink(argv[1]) == -1){
+ 	perror ("unlink failed");
+ 	unlink (argv[2]);
+ 	exit (1);
+ }
+ printf ("Succeeded\n");
+}
+```
+명령을 쓸 때 `$ a.out arg1, arg2, arg3` 이런 문자열을 셸이 읽고 파싱(parsing)을 합니다.  
+문자열 사이 공백이 딜리미터(delemeter, 구분자)라 각각을 파악 합니다.  
+문자열을 분리해서 만들어 놓습니다.  
+argc는 나눠 놓은 것들의 개수, 여기선 4(파일명 + 뒤에 인자들)입니다.
+
+문자열엔 포인터가 있고 이런 문자열 포인터들의 배열이 필요합니다.  
+```c
+int* X; X = (int*)malloc(sizeof(int),100);
+```
+이게 int X[100];과 같습니다.
+
+즉 어레이(array, 배열)는 포인터가 어레이가 되므로, 포인터에 어레이를 쓰려면 ***가 하나 더 있어야 합니다**(이중 포인터).
+
+이 경우엔 argv[0], argv[1], argv[2], argv[3]이 있습니다.  
+argv는 이 배열의 첫 번째 주소를 가리킵니다.  
+각 인덱스들은 각각의 문자열을 가리킵니다.(캐릭터 포인터형 배열)  
+argc는 argv들의 개수만큼 크기입니다.
+
+캐릭터(char)의 포인터를 가리키는 포인터니까, 포인터의 포인터(*이 2개 들어감)
+
+>포인터가 보물의 위치를 나타내는 지도라면
+>> 이중 포인터는 그 지도가 묻혀있는 곳을 나타내는 비밀 문서입니다.
+
+argc가 3이 아니면 exit합니다.  
+즉, argc가 3일 때만 다음으로 넘어갑니다.(명령어와 아규먼트(인자) 2개)  
+argv[0]가 명령어니까 [1], [2]는 아규먼트1, 아규먼트2 입니다.
+
+첫 아규먼트에 오리지날 파일, 두 번째 아규먼트에 뉴 링크(오리지널 파일에 새 하드 링크가 추가 된다)를 넣습니다.  
+기존 연결된 링크가 새로운 링크로 바뀝니다.  
+언링크로 기존 링크를 지웁니다.  
+이게 바로 파일 이름을 바꾸는 코드입니다.
+
 ## The remove(2) system call
+```c
+#include <stdio.h>
+
+int remove(const char *pathname);
+//Returns: 0 if OK, -1 on error
+```
+- 파일의 경우 remove는 unlink와 동일합니다.
+- ISO C는 파일을 삭제하기 위한 remove 함수를 지정했습니다.
+- C 표준을 구현하는 대부분의 비 UNIX 시스템이 당시 파일에 대한 링크 개념을 지원하지 않았기 때문에 역사적인 UNIX 이름인 unlink에서 변경되었습니다.
+
+리무브 시스템 콜 = 언링크 시스템 콜  
+`stdio.h` include하고 int remove(const char *pathname);(성공하면 0, 실패하면 –1 리턴)  
+처음에 링크를 만들고 언링크를 만들었는데, 그 기능과 이름이 서로 잘 맞지 않아서 추가했을 것이라 추정됩니다.
+
 ## The rename(2) system call
+```c
+#include <stdio.h>
+
+int rename(const char *oldname, const char *newname);
+
+//Returns: 0 if OK, -1 on error
+```
+- rename 함수로 파일이나 디렉토리의 이름을 바꿉니다.
+- 이 함수는 ISO C에서 파일을 위해 정의합니다. (C 표준은 디렉토리를 다루지 않습니다.) POSIX.1은 디렉토리와 심볼릭 링크를 포함하도록 정의를 확장했습니다.
+- Arguments(인자들)
+    - oldname과 newname이 같은 파일을 참조하는 경우 함수는 아무것도 변경하지 않고 성공적으로 반환합니다.
+
+`stdio.h` include하고, int rename(const char *oldname, const char *newname); (0, -1 리턴)  
+원래는 위에 [예제](https://ji-hun-park.github.io/linux/Linux-Theory-03/#example-3)처럼 코드를 짰으나 이런 기능을 자주 이용하다 보니 나중에 만들어 졌습니다.
+
 ## The symlink(2) system call
 ## The readlink(2) system call
 # 3.3 Obtaining file information: *stat* and *fstat*
@@ -625,8 +740,6 @@ link(“/usr/keith/chap.2”, “/usr/ben/2.chap”);
 ### The stat(2) system call (2/2)
 ### example
 ## 작성중
-
-![그림16](https://ji-hun-park.github.io/assets/images/그림61.jpg "그림16"){: .align-center}
 ![그림17](https://ji-hun-park.github.io/assets/images/그림62.jpg "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/그림63.jpg "그림18"){: .align-center}
 ![그림19](https://ji-hun-park.github.io/assets/images/그림64.jpg "그림19"){: .align-center}
