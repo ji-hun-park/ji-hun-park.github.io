@@ -9,7 +9,7 @@ tags:
   - Lecture
   - Theory
   - Practice
-last_modified_at: 2025-02-06T16:10:00-00:00
+last_modified_at: 2025-02-05T16:10:00-00:00
 ---
 
 # Linux Lecture Introduction
