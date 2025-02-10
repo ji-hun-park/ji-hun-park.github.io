@@ -18,7 +18,7 @@ last_modified_at: 2025-02-10T16:00:00-00:00
 여러 우분투 환경을 고려해 그에 대한 설명은 생략합니다.  
 각자의 방법으로 Ubuntu 18.04를 세팅하시면 됩니다.  
 ```
-tip: GUI가 제공될 경우, 단축키 [CTRL]+[ALT]+t 를 통해 터미널 창을 띄운 후, 터미널 아이콘에 커서를 대고 우클릭 후 “즐겨찾기에 추가” 을 클릭하면 터미널 실행이 편해집니다.
+tip: GUI가 제공될 경우, 단축키 [CTRL]+[ALT]+T 를 통해 터미널 창을 띄운 후, 터미널 아이콘에 커서를 대고 우클릭 후 “즐겨찾기에 추가”를 클릭하면 터미널 실행이 편해집니다.
 ```
 ## Packages
 ### 1. Build-essential 설치하기
@@ -33,6 +33,7 @@ sudo apt-get install build-essential
 ```c
 sudo apt-get install vim
 ```
+> vim이 익숙지 않으신 분들은 GNU **Nano** Editor로 코드 작성하셔도 됩니다.
 
 ### 3. ctags 설치하기
 ctags는 소스 파일을 태그 단위로 잘라서 태그 정보를 토대로 소스 분석을 도와주는 유틸리티입니다. 터미널 실행 후 셸에 다음을 입력  
@@ -45,3 +46,7 @@ sudo apt-get install ctags
 ```c
 sudo apt-get install gdb
 ```
+
+## 마무리
+이상으로 이번 실습을 마치겠습니다.
+열심히 따라와 주셔서 감사합니다!
