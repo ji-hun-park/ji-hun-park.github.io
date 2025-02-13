@@ -1,6 +1,6 @@
 ---
-title:  "Linux 기초 실습 04 \Makefile"
-excerpt: "Linux 기초 실습 04 \Makefile 만들기"
+title:  "Linux 기초 실습 04 \Make\file"
+excerpt: "Linux 기초 실습 04 \Make\file 만들기"
 toc_label: "목차"
 categories:
   - Linux
