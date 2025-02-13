@@ -1,6 +1,6 @@
 ---
-title:  "Linux 기초 실습 04 \Ma\ke\fi\le"
-excerpt: "Linux 기초 실습 04 \Ma\ke\fi\le 만들기"
+title:  "Linux 기초 실습 04 M∀kefile"
+excerpt: "Linux 기초 실습 04 M∀kefile 만들기"
 toc_label: "목차"
 categories:
   - Linux
