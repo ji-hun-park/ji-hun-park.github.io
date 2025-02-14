@@ -203,7 +203,7 @@ int mkdir(const char *pathname, mode_t mode);
 명령어와 똑같이 시스템 콜에도 mkdir이 있다.  
 system 밑에 stat 헤더 인클루드하고, 첫 번째 인자는 패스네임, 두 번째 인자는 퍼미션, 성공 시 0, 실패 시 -1 리턴
 
-퍼미션은 mask(퍼미션 제한) 적용, 디렉터리를 만들면 .과 ..이 디폴트(default)로 만들어진다.  
+퍼미션은 프로세스의 umask(퍼미션 제한) 적용, mkdir로 디렉터리를 만들면 두 개의 링크 .과 ..이 디폴트(default)로 만들어진다.  
 보통은 r, w 권한만 주지만 디렉터리는 x 권한을 줘야 체인지 디렉터리(cd)가 가능하다.  
 ```c
 $ mkdir dir
@@ -239,6 +239,172 @@ ls는 불가하지만 cat은 가능해진다.
 디렉터리 생성된 파일과 마찬가지로 프로세스의 umask에 영향을 받는다.  
 디렉터리에 퍼미션을 설정할때 가장 많이 하는 실수는 파일과 동일하게 read와 write퍼미션 만을 설정하는 것이다.  
 그러나 디렉터리 내에 file에 접근하기 위해서는 디렉터리에 대한 실행권한이 필요함을 알아야 한다.
+
+## The rmdir(2) system call
+```c
+#include <unistd.h>
+
+int rmdir(const char *pathname);
+
+//Returns: 0 if OK, -1 on error
+```
+디렉터리를 삭제하기 위해서는 오직 . 과 .. 두 개의 파일만이 존재해야 합니다.  
+빈 디렉터리는 rmdir 함수로 삭제됩니다.  
+빈 디렉터리는 dot과 dot-dot에 대한 항목만 포함하는 디렉터리라는 점을 기억하세요.
+
+- $ rmdir dir로 디렉터리를 지울 수 있음(단, 밑에 파일이 하나도 없을 때만 가능)
+- 명령어와 같은 이름의 시스템 콜 rmdir, 우선 `<unistd.h>` 인클루드
+- int rmdir(const char *pathname); 성공 시 0 실패 시 –1 리턴, 패스네임은 디렉터리명
+- 디렉터리만 지울 수 있다, 닷(점), 닷닷(점점)을 제외한 파일이 있으면 지울 수 없음
+
+## The opendir(3)
+```c
+#include <dirent.h>
+
+DIR *opendir(const char *dirname);
+ 
+//Returns: pointer if OK, NULL on error
+```
+`DIR`은 표준(Standard) I/O 라이브러리에서 사용되는 FILE type(FILE Pointer)과 비슷한 방식으로 작동합니다.  
+항상 널 포인터를 테스트하기 위해 적절한 오류 검사 코드를 작성해야 합니다.  
+프로그램이 디렉터리에 대한 접근을 마치면 닫아야 합니다.  
+이는 `closedir` 함수로 할 수 있습니다.
+
+- (3)은 라이브러리
+- `<dirent.h>` 인클루드하고,
+- DIR *opendir(const char *dirname); 성공하면 포인터, 실패하면 널 리턴
+- 그냥 오픈을 쓰면 **EISDIR** 에러넘버 나오면서 오픈에 실패한다
+- 디렉터리 패스네임을 집어 넣으면 디렉터리 포인터를 리턴해 줌
+- **DIR**은 스탠다드(표준) I/O 라이브러리에서 정의된 **FILE**
+- 오픈에 실패하면 널 포인터가 리턴된다
+- close도 시스템 콜이 아닌 closedir 라이브러리 사용
+
+## The closedir(3)
+```c
+#include <dirent.h>
+
+int closedir(DIR *dirptr);
+
+//Returns: 0 if OK, -1 on error
+```
+`closedir` 함수는 인자 `dirptr`가 가리키는 디렉터리 스트림을 닫는다.  
+```c
+#include <stdlib.h>
+#include <dirent.h>
+
+main(){
+   DIR *dp;
+   if ((dp = opendir("/tmp/dir1")) == NULL){
+      fprintf (stderr, "Error on opening directory /tmp/dir1\n");
+      exit(1);
+   }
+
+   /* 디렉터리에 대한 코드를 처리한다. */
+   closedir(dp);
+}
+```
+인자로 `opendir`에서 나오는 디렉터리 포인터 값을 넣는다.
+
+## The readdir(3)
+```c
+#include <dirent.h>
+
+struct dirent *readdir(DIR *dp);
+
+//Returns: pointer if OK, NULL at end of directory or error
+```
+첫 번째 `readdir`에서 첫 번째 디렉터리 항목(entry)이 struct dirent로 읽혀집니다.  
+`readdir` 완료 시 directory pointer는 다음 엔트리로 이동합니다.  
+
+읽을 때도 `readdir` 이라는 라이브러리 사용, `<dirent.h>` 인클루드하고,  
+struct dirent *readdir (DIR *dp); 성공하면 디렉터리 포인터, 실패(또는 EOD, 엔드 오브 디렉터리)하면 널 리턴
+
+디렉터리 엔트리 구조체 안에 dino, dname 2개의 맴버 변수가 있다.  
+읽으면 엔트리 하나가 넘어온다,  
+파일 오프셋이 읽은 만큼 이동하면서 다음 엔트리를 가리킨다.
+
+## The rewinddir(3)
+```c
+#include <dirent.h>
+
+void rewinddir(DIR *dp);
+
+//Returns: 0 if OK, -1 on error
+```
+`rewinddir` 호출에 이어 다음 `readdir`은 `dp`가 가리키는 디렉터리의 첫 번째 항목을 반환한다.
+
+`rewinddir`(리와인드 디렉터리, 디렉터리 되감기) 라이브러리 - `<dirent.h>` 인클루드하고,  
+void rewinddir(DIR *dp); 성공하면 0, 실패하면 –1 리턴  
+read를 쭉하다가 엔드 오브 엔트리를 만나면 더 이상 못 읽는데, 포인터를 다시 처음으로 초기화한다.
+
+## example
+### example (1/2)
+```c
+#include <dirent.h>
+
+int my_double_ls (const char *name){
+   struct dirent *d;
+   DIR *dp;
+
+   /* 디렉토리를 개방하고, 실패여부를 점검함 */
+   if ((dp=opendir(name)) == NULL)
+   return (-1);
+
+   /* 디렉토리를 살피면서 루프, 이때 inode번호가 유효하면 디렉토리항을 프린트 */
+   while (d = readdir(dp)){
+      if (d->d_ino !=0)
+         printf ("%s\n", d->d_name);
+   }
+
+   rewinddir(dp); /*이제 디렉토리의 시작으로 되돌아간다 ... */
+ 
+   while (d = readdir(dp)){/* ... 그리고 디렉토리를 다시 프린트한다. */
+      if (d->d_ino != 0)
+         printf ("%s\n", d->d_name);
+   }
+  closedir (dp);
+}
+```
+
+### example (2/2)
+```c
+#include <stdio.h> /* NULL을 정의 */
+#include <dirent.h>
+#include <string.h> /* 스트링 함수를 정의 */
+int match(const char *, const char *);
+
+char *find_entry(char *dirname, char *suffix, int cont){
+   static DIR *dp=NULL;		struct dirent *d;
+
+   if (dp == NULL || cont == 0){
+      if (dp != NULL)
+         closedir (dp);
+      if ((dp = opendir (dirname)) == NULL)
+         return (NULL);
+   }
+
+   while (d = readdir(dp)){
+      if (d->d_ino == 0)
+         continue;
+      if (match (d->d_name, suffix))
+         return (d->d_name);
+   }
+   closedir (dp);
+   dp = NULL
+   return (NULL);
+}
+
+int match (const char *s1, const char *s2)
+{
+   int diff = strlen(s1)- strlen(s2);
+
+   if (strlen(s1) > strlen(s2))
+      return (strcmp(&s1[diff], s2) == 0);
+   else
+      return (0);
+}
+```
+![그림16](https://ji-hun-park.github.io/assets/images/LNXIMG037.jpg "그림16"){: .align-center}
 
 ## 작성중
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
