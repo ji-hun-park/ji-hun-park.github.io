@@ -455,7 +455,7 @@ $ chown user2 test
 ```
 - user2에게 test 파일의 오너를 넘겨준다(자신의 소유 파일만 가능)
 
-파일의 오너쉽이 바뀔 때 자동적으로 1이 0으로 턴오프(바뀐다)
+**파일의 오너쉽이 바뀔 때 자동적으로 1이 0으로 턴오프(바뀐다) - 중요!**
 
 ## set-user-id and set-group-id permission are turned off for a file when the ownership of that file is altered.
 스파이가 해킹 파일을 만들 때 체인지 오너(chown)에서 자동으로 rws를 rwx로 바꿔줘서 자정 작용을 합니다.  
@@ -464,6 +464,44 @@ $ chown user2 test
 > 권한이 s인 파일을 실행하면 유저 아이디가 super로 바뀌니까,  
 그 유저 아이디로 파일을 맘대로 보고 바꾸고 실행할 수 있음  
 심지어 체인지 오너(chown)로 파일의 소유권을 바꿀 수도 있으니 이를 방지함
+
+### 상세 설명
+>쌤숭이란 회사가 아주 많은 돈을 들여 반도체 설계 도면을 만듦  
+정상적인 쌤숭 직원(suser)가 있음  
+설계 도면 안에 TopSecret이라는 파일을 만듦  
+owner는 쌤숭 직원(suser)  
+suser의 UID는 100  
+파일의 권한은 rw- --- ---(오너만 읽기, 쓰기 가능, 나머지는 권한 없음)  
+설계도면의 실행파일 a.out 오너가 수정 가능(오너는 suser, 권한은 rwx------, 본인만 읽기, 쓰기, 실행 가능)  
+a.out으로 TopSecret 파일 읽기 쓰기 가능(본인이 하는 건 정상)  
+협업을 위해 b.out 만듦(TopSecret에 제한된 접근만 허용)  
+만든 사람 = owner = suer(쌤숭직원)  
+권한은 rwsr-xr-x(협업을 위해 타인이 실행할 수 있게 만듦)  
+s(set-user-id on execution) 권한 세팅됨  
+쌤숭의 기술을 호시탐탐 노리는 산업스파이가 있음  
+spy uid는 200  
+이 사람이 로그인해 b.out으로 TopSecret 접근해도 권한이 제한되니 별문제 없음  
+이 때 spy가 b.out 실행 시 ruid = 200이나,  
+s권한 때문에 euid = 100이 됨  
+euid가 100으로 변해서 TopSecret에 엑세스(접근) 가능함  
+그러나 쌤숭 직원이 이런 것들까지 다 고려해서 b.out을 만들었으니 별문제 없음  
+문제는 다른 곳에 있음  
+spy가 직접 c.out이란 프로그램을 만듦(owner가 spy가 됨, 권한은 rwsr-xr-x)  
+```
+ $ chown suser c.out(내가 만든 실행 파일의 오너를 쌤숭 직원으로 변경)
+```
+c.out의 권한 rwsr-xr-x, owner는 suser로 바뀜  
+spy가 c.out 실행, c.out 내용은 fd = open (“TopSecret”, O_RDWR);  
+read(fd, _); write(fd, _);  
+spy가 c.out을 통해 TopSecret 접근 시 ruid는 200(spy)이나,  
+euid는 권한 s 때문에 100(suser, 쌤숭 직원)으로 변함  
+즉 스파이가 자기가 만든 파일을 통해 쌤숭 직원의 권한으로  
+TopSecret(설계 도면)을 읽기 쓰기가 가능해짐(도둑질이 가능해짐)  
+도둑질이 가능해진 이유는 자기가 만든 파일의 오너를 쌤숭 직원으로 변경하고,  
+s권한을 이용해 euid를 삼성 직원의 euid로 바꿀 수 있게 만들었기 때문  
+이것을 방지하기 위해 chown로 오너를 바꿀 때 s 권한을 자동적으로 클리어(1에서 0으로 변경)해야 함  
+이러면 c.out을 실행해도 euid는 100(suer)이 아닌 200(spy)이라 TopSecret 접근 권한 없음  
+그래서 chown할 때 s권한을 자동으로 Turn Off 시켜줌
 
 # 3.2 File with multiple names
 ## File System
