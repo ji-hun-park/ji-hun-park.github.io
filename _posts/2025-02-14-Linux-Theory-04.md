@@ -92,18 +92,155 @@ Inode number가 0이면, 이것은 해당파일이 더 이상 존재하지 않�
 
 ### example (2/2)
 ![그림06](https://ji-hun-park.github.io/assets/images/LNXIMG027.jpg "그림06"){: .align-center}
-- cat은 파일들을 합쳐서 복사하는 명령(한 개면 단순 카피해서 옮기기)
-    - 위 이미지에서 파란색 네모 안에 cat과 > 사이에 KBD가 빠짐
+- cat은 파일들을 합쳐서 복사하는 명령(한 개면 단순 카피해서 옮기기).
+    - 위 이미지에서 파란색 네모 안에 cat과 > 사이에 KBD가 빠짐.
     - cat f1 f2 fn > fout
     - cat f1 > fout
-- cat > out 이 경우엔 키보드가 된다
+- cat > out 이 경우엔 키보드가 된다.
 - ^D(컨트롤D)는 엔드 오브 파일(EOF), 입력이 끝나면 테스트1이라는 파일이 새로 생성된다.
-- mkdir로 디렉 생성
+- mkdir로 디렉터리 생성
 
-디렉토리의 링크카운트는 처음생성시 무조건 2가된다. 이유는 디렉토를 생성한 위치에서의 디렉토리 엔트리와 자기 자신을 가리키는 .에 의해서이다. 그리고 새로 생성된 디렉토리는 ..이 있기 때문에 상위 디렉토리의 링크카운트를 1늘린다.
+디렉터리의 링크카운트는 처음 생성 시 무조건 2가 된다.  
+그 이유는 디렉터리를 생성한 위치에서의 디렉터리 엔트리와 자기 자신을 가리키는 .에 의해서이다.  
+그리고 새로 생성된 디렉터리는 ..이 있기 때문에 상위 디렉터리의 링크카운트를 1늘린다.
+
+## Directory permissions
+### Directory permissions (1/3)
+디렉터리 권한(permissions)은 일반 파일 권한과 정확히 같은 방식으로 구성됩니다.  
+그러나 해석은(의미는) 다소 다릅니다.
+
+- 리드 퍼미션 (read permission, 읽기 권한)
+    - 파일 또는 하위 디렉터리 이름 나열(list)을 읽는 권한(안의 목록을 볼 수 있음)
+- 라이트 퍼미션 (write permission, 쓰기 권한)
+    - 새 파일 생성, 기존 파일 제거, 이름 바꾸기 권한
+        - 삭제나 생성은 단순히 엔트리를 추가하거나 삭제하는 것으로 이해하면 직관적으로 이해하는데 도움이 된다.
+- 엑스큐트 퍼미션(서치 퍼미션) (execute permission, 실행 권한(search permission, 검색 권한))
+    - 프로그램 내에서 디렉터리 이동(`chdir` 시스템 콜), 커렌트(current, 현재) 디렉터리로 잡을 수 있는 권한
+        - 디렉터리 내에 object들을 검색하는 권한을 말한다.
+
+### Directory permissions (2/3)
+예를 들어, **/usr/include/stdio.h** 파일을 열려면 실행 권한이 필요합니다.  
+```
+ /,/usr,/usr/include
+```
+- 디렉터리에 대한 읽기 권한과 디렉터리에 대한 실행 권한은 다른 것을 의미합니다.
+    - 읽기 권한: 디렉터리에 있는 모든 파일 이름 목록을 얻는 것
+    - 실행 권한: 디렉터리를 통과(pass)함(특정 파일 이름을 찾으려면 디렉터리를 검색해야 함).
+
+이것이 디렉터리에 대한 실행 권한 비트를 종종 검색 비트라고 하는 이유입니다.
+
+예를 들어 `/usr/include/stdio.h`파일을 open하기 위해선 각 디렉터리에 대해 실행 권한이 있어야 한다.  
+디렉터리의 read 퍼미션과 execute 퍼미션은 분명히 다름을 기억해야한다.  
+read는 파일목록을 얻기 위한 권한이고, execute 권한은 디렉터리 내에 특별한 파일을 찾기 위해 디렉터리를 검색하는 권한이다.
+
+### Directory permissions (3/3)
+- Save-text-image(스티키 비트) - **S_ISVTX**
+- 디렉터리에 이 비트가 설정된 경우
+    - 디렉터리의 파일은 사용자에게 디렉터리에 대한 쓰기 권한이 있고 다음 중 하나가 있는 경우에만 제거하거나 이름을 바꿀 수 있습니다.
+        - 파일 소유자(Owner)
+        - 디렉터리 소유자(Owner)
+        - 슈퍼유저(Superuser)
+- 다른 사용자는 다른 사람이 소유한 파일을 삭제하거나 이름을 바꿀 수 없습니다.
+
+save-text-image 비트가 디렉터리에 설정되면 특별한 의미를 가진다.  
+
+다음을 가정하자, 어느 특정 그룹에서 소속되는 그룹 사용자들이 공용으로 사용하는 디렉터터리가 있다고 가정하자.  
+이때 이 디렉터리의 권한이 rwxrwx---로 설정되어 있다고 하자.  
+이때 이 그룹의 a라는 사용자는 그룹의 write권한이 있으므로 file을 작성할 수 있다.  
+이때 작성한 파일을 file1이라 하자.  
+이때 그룹의 b라는 사용자는 그 디렉터리에 w권한이 있으므로 a가 작성한 file을 삭제할 수 있다.  
+이러한 상황은 a사용자가 원하지 않을 수 있다.  
+
+디렉터리에서 이러한 설정을 막기 위해 save text image bit를 설정한다.  
+이 비트가 설정된 디렉터리의 파일은 파일 소유자 혹은 디렉터리 소유자만이 파일을 지울 수 있다.  
+물론 수퍼유저는 파일 삭제가 가능하다.  
+![그림07](https://ji-hun-park.github.io/assets/images/LNXIMG028.jpg "그림07"){: .align-center}
+ls(리스트)를 l옵션(롱 포맷)에 a 옵션으로 히든 파일(.과 ..등)까지 본다.  
+파일 형식, 퍼미션, 오너아이디, 그룹아이디, 파일 크기, 날짜, 파일명 순이다.  
+
+파일을 오픈할 때(인클루드도) 그 상위 디렉터리에 X 퍼미션이 필요(그 파일 자체도 리드 퍼미션 필요)하다.  
+상위 디렉터리 중에 하나라도 X 퍼미션이 없으면 오픈이 불가하다.  
+
+디렉터리에서 리드와 X 퍼미션은 서로 다르다.  
+리드는 디렉터리 목록을 **볼 수만** 있고, X는 그 디렉터리 자체로 들어 갈 수 있는 권한(서치 퍼미션이라고도 한다)이다.  
+(검색할 때 다른 디렉터리를 거쳐가야 하므로)
+
+`st_mode`에서 앞 4비트는 파일 타입, sgt rwx(u) rwx(g) rwx(o)  
+여기서 t(sticky bit, 스티키 비트)가 파일에선 의미가 없지만, 디렉터리에서 1로 설정되면 의미가 있다.
+
+디렉터리에 있는 파일을 삭제하거나 이름을 바꾼다는 것은 디렉터리에 대해 라이트 퍼미션이 있어야 하는데, 스티키 비트가 있으면 라이트 퍼미션 뿐 아니라 다음 중 하나가 더 있어야 한다 – 파일의 오너거나, 디렉터리의 소유자거나, 슈퍼유저거나  
+셋 유저 아이디 온 엑스큐션은 유저 퍼미션 x가 s로 바뀌고, 셋 그룹 온 엑스큐션은 그룹 퍼미션 x가 g로 표시되고, 스티키 비트는 아더스(others) x가 t로 바뀐다.
+
+# 4.4 Programming with directories
+디렉터리와 관련된 프로그래밍을 위해 몇가지 자료구조와 시스템 콜을 알아야 합니다.
+
+## The dirent structure
+```c
+#include <dirent.h>
+
+struct dirent {
+        ino_t d_ino;                /* i-node number */
+        char  d_name[NAME_MAX + 1]; /* null-terminated filename */
+      }
+```
+`d_ino`의 값이 0이면 디렉터리에 빈 슬롯이 있음을 나타냅니다.
+
+`dirent` 구조체, 디렉터리 엔트리는 파일명과 아이노드 번호로 이루어졌음.  
+`<dirent.h>` 인클루드 후,  
+>struct dirent { ino_t d_ino;	char d_name[NAME_MAX + 1]; }
+
+첫 번째 인자는 아이노드 번호 두 번째 인자는 파일명(+1은 마지막 널 문자)  
+ino_t는 long 또는 int 혹은 unsigned
+
+## The mkdir(2) system call
+```c
+#include <sys/stat.h>
+
+int mkdir(const char *pathname, mode_t mode);
+
+//Returns: 0 if OK, -1 on error
+```
+명령어와 똑같이 시스템 콜에도 mkdir이 있다.  
+system 밑에 stat 헤더 인클루드하고, 첫 번째 인자는 패스네임, 두 번째 인자는 퍼미션, 성공 시 0, 실패 시 -1 리턴
+
+퍼미션은 mask(퍼미션 제한) 적용, 디렉터리를 만들면 .과 ..이 디폴트(default)로 만들어진다.  
+보통은 r, w 권한만 주지만 디렉터리는 x 권한을 줘야 체인지 디렉터리(cd)가 가능하다.  
+```c
+$ mkdir dir
+$ cat > dir/file.txt
+test test test ^D
+$ chmod 666 dir
+```
+첫 번째 예제  
+dir이란 이름의 디렉터리를 새로 만들고 cat으로 키보드를 통해 입력 받은 값으로 dir 밑에 file.txt란 파일을 새로 만든다.  
+test 3번 입력하고 컨트롤D(^D)하면 파일이 생성된다.  
+체인지모드(chmod) 666으로 디렉터리 권한을 변경하면 rw-rw-rw- 로 퍼미션이 변경된다.  
+```c
+$ ls dir   // read entries
+dir/file.txt
+$ cat dir/file.txt
+cat: dir/file.txt: 허가 거부됨
+```
+ls 명령어로 dir에 있는 엔트리 들은 볼 수 있다.  
+하지만 캣(cat) 명령은 실행 불가하다.  
+그냥 `cat file`하면 디폴트(default)는 스크린(screen, 모니터)  
+>cat file (> screen)  
+
+cat하려면 파일을 오픈해서 열어야하므로 불가하다.  
+```c
+$ chmod 111 dir
+$ ls dir  :허가 거부됨
+$ cat dir/file.txt
+test test test
+```
+체인지모드(chmod)로 111로 퍼미션을 변경(셋 다 x 퍼미션만 있음)한다.  
+ls는 불가하지만 cat은 가능해진다.
+
+디렉터리 생성된 파일과 마찬가지로 프로세스의 umask에 영향을 받는다.  
+디렉터리에 퍼미션을 설정할때 가장 많이 하는 실수는 파일과 동일하게 read와 write퍼미션 만을 설정하는 것이다.  
+그러나 디렉터리 내에 file에 접근하기 위해서는 디렉터리에 대한 실행권한이 필요함을 알아야 한다.
 
 ## 작성중
-![그림07](https://ji-hun-park.github.io/assets/images/LNXIMG028.jpg "그림07"){: .align-center}
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG030.jpg "그림09"){: .align-center}
 ![그림10](https://ji-hun-park.github.io/assets/images/LNXIMG031.jpg "그림10"){: .align-center}
