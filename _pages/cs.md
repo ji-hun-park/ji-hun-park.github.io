@@ -20,7 +20,7 @@ toc_label: "목차"
 ## OverFitting
 오버피팅된 AI = 책을 한 권만 읽은 사람
 
-## Abstract Data Structure
+## Abstract Data Types
 추상 자료 구조를 시계라고 생각하자 (스택, 큐)   
 시계는 시간을 볼 수 있는 기능만 있으면 된다 (FIFO, LIFO)   
 시계를 만드는 방법은 다양하다 (배열, 리스트)  
