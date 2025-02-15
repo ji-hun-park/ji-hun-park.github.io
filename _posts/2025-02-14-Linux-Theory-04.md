@@ -651,13 +651,267 @@ int fsync(int filedes); void sync(void); 리턴 값은 성공 시 0, 실패 시 
 싱크는 즉각 리턴된다(모든 데이터 write이 스케쥴되고 완료되지 않아도).  
 유닉스 시스템은 OS 차원에서 싱크를 주기적으로 실행시켜준다.
 
-## 작성중
+# 4.6 UNIX device files
+유닉스의 디바이스 파일들(디스크, 테이프, 키보드, USB, 모니터, 프린터 등등, 디스크도 여려 개 있음)
+
+## Device of UNIX
+### Device of UNIX (1/2)
+UNIX에서 장치(Device)는 할당된 특정한한 장치 번호(Device number)로 액세스합니다.  
+장치 번호는 major-number와 minor-number로 구성됩니다.  
+major-number: 장치 유형(type of device, 장치 드라이버(device driver))에 따라 정해짐.  
+minor-number: 특정 장치의 인스턴스.(같은 종류의 디바이스가 여러 종류 있으니 구분하기 위한 번호)
+
+하지만 사용자들은 특정 장치에 액세스하는 데 장치 번호를 사용하고 싶어하지 않습니다.(각 디바이스에 대한 숫자의 쌍을 기억하길 원하지 않는다.)  
+이에 대한 자연스러운 해결책은 파일 뿐 아니라 디바이스를 기술하기 위해서도 파일시스템 이름 공간을 사용하는 것입니다.  
+UNIX는 디바이스 파일(device file)이라는 개념을 도입하여 장치 번호를 장치 파일에 매핑했습니다.(파일과 디바이스에 대한 일관된 인터페이스를 제공함)  
+파일을 특정 디바이스에 넣기 위해선 메이저와 마이너 넘버 둘을 동시에 지정해야 합니다.
+
+유닉스 파일시스템의 특징  
+- 파일이 디렉터리나 심볼릭 링크, 디스크나 터미널, 프린터 같은 하드웨어 장치들, 시스템 메모리 같은 가상 장치, 그리고 파이프나 소켓 같은 통신 추상 개념 등 입/출력과 관련된 모든 종류의 객체들을 포함하도록 파일 추상 개념을 일반화 하고 있음
+- 이들은 파일 디스트립터를 통해 접근 가능
+- 기존 일반파일의 시스템 콜을 통해 이러한 특수 파일들을 조작한다.
+
+### Device of UNIX (2/2)
+- 장치 파일(Device file, `/dev/`에 있음, 루트 밑 dev 디렉터리 안에 장치 파일들 모여 있음)
+- 장치 파일의 i-노드에는 장치 번호(inode->i_rdev)가 포함됩니다.
+    - st_dev(해당 장치 파일이 저장되어있는 디스크의 메이저, 마이너 넘버가 있는 곳)
+    - st_rdev(메이저, 마이너 넘버가 있는 곳)
+- 주변 장치(peripheral devices)에 대한 간단한 인터페이스를 제공합니다.
+- 장치 파일은 파일 시스템에 나타납니다.
+- 사용자는 표준 시스템 호출을 사용하여 장치에 액세스하고 이를 일반 컴퓨터 파일처럼 취급합니다.
+    - 일반 파일을 디바이스에 바로 아웃풋할 수 있다.
+- 장치 파일은 슈퍼유저만 생성 가능합니다.
+
+주변 장치(peripheral device)  
+유닉스 시스템에서 주변 장치는 파일 시스템의 파일 이름을 통해 액세스(접근)합니다.  
+디스크, 터미널, 프린터, 테이프 장치 등이 있습니다.  
+일반적인 디스크 파일과 달리 이러한 장치 파일에 대한 읽기 및 쓰기는 시스템과 해당 주변 장치 간에 데이터를 직접 전송합니다.(즉, 캐쉬를 거치지 않습니다.)  
+
+- 이러한 특수 파일들은 `/dev`라는 디렉터리에 저장됩니다.
+    - /dev/tty00    (터미널)
+    - /dev/console  (콘솔)
+    - /dev/pts/as   (터미널)
+    - /dev/lp   (라인 프린터)
+    - /dev/rmt0     (마그네틱 테이프)
+    - /dev/rmt/0cbn     (마그네틱 테이프)
+    - /dev/dsk/c0b0t0d0s3   (디스크)
+    - /dev/dsk/hd0d     (디스크)
+
+장치 파일은 command level 또는 일반 파일처럼 프로그램 내에서 사용할 수 있습니다.
+```
+ $ cat fred > /dev/lp
+ $ cat fred > /dev/rmt0
+```
+```
+ mknod(path, mode, dev);
+```
+- path : dev번호를 맵핑할 파일명
+- mode : 접근 권한
+- dev : major+minor번호
+- 디바이스 파일의 장점
+    - 디바이스에 대한 접근을 일관된 방법으로 컨트롤 할 수 있음.
+    - 파일 입출력 루틴을 디바이스에 그대로 적용이 가능
+
+### example
+```c
+#include<fcntl.h>
+
+main()
+{
+   int i, fd;
+
+   fd = open("/dev/tty00", O_WRONLY);
+
+   for(i = 0; i < 100; i++)
+      write(fd, "x", 1);
+
+   close(fd);
+}
+```
+터미널 디바이스는 멍텅구리다.  
+라이트 온리로 오픈하고, 리얼 모니터를 가리키는 포인터를 리턴한다.  
+모니터에 x를 100번 라이트하면 출력한다.
+
+## Block and character device files
+### Block and character device files (1/4)
+블록 장치 파일(Block device file)  
+I/O 단위가 블록 단위(한 번 이동 시 4k 바이트 단위) 전송  
+디스크, 자기 테이프등이 있다.  
+랜덤 액세스 가능(테이프는 시퀀셜 엑세스)  
+파일 시스템은 블록 장치에만 존재할 수 있으므로 이러한 블록 장치는 빠른 액세스를 위해 종종 원시 장치라고 알려진 연관된 문자 장치를 갖습니다. (mkfs, fsck)
+
+문자 장치 파일(Character device file)  
+터미널, 모뎀, 프린터, 키보드 등  
+랜덤 액세스(가능할 수도 있지만 대게는 불가능)
+
+UNIX는 주변 장치(I/O 기능들)와 상호 작용하기 위해 두 개의 운영 체제 구성 테이블을 사용합니다.  
+- 블록 장치 스위치 테이블: bdevsw[]
+- 문자 장치 스위치 테이블: cdevsw[]
+
+두 테이블 모두 장치 파일의 i-노드에 저장된 주요 장치 번호라는 값을 사용하여 인덱싱됩니다.
+
+**실질적으로 단일 인터페이스가 모든 디바이스들에 적합하지는 않다**  
+- 왜냐하면 디바이스들의 기능과 접근 방법이 매우 다양하기 때문이다.
+- 그래서 유닉스는 두 종류의 디바이스로 구분하고, 각각에 대해 다른 인터페이스를 정의한다.
+
+**Block device**  
+- 블록 단위로 데이터를 저장하고 입출력을 수행한다.
+- 블록의 크기는 512 혹은 ‘512 X 2의배수’ 이다.
+- 하드디스크, 플로피디스크, CD-ROM
+- 블록 디바이스만이 유닉스 파일 시스템을 포함할 수 있다.
+- 커널은 buf구조를 통해 블록 디바이스 드라이버들과 통신한다. 즉, buf를 통해 입출력된다.
+- 전통적으로 buffer cache라 불리는 메모리 장소에 데이터를 쓰거나 그 메모리 장소로 부터 데이터를 읽어옴
+
+**Character device**  
+- 임의의 크기의 데이터를 저장하거나 전송할 수 있음
+- 커널은 데이터를 순차적으로 접근하는 연속된 바이트-스트림으로 해석
+- 임의의 주소로 접근 불가능, 탐색 연산을 허용하지 않음
+- 터미널, 프린터, 마우스, 사운드 카드등.
+
+**디바이스 드라이버**  
+- 커널은 디바이스 드라이버를 통해 장치와 상호 작용한다.
+- 드라이버는 하나 이상의 장치를 제어
+- 디바이스와 상호 작용하는 유일한 모듈.
+- 디바이스 드라이버는 struct cdevsw나 bdevsw의 함수들에 대한 특정한 구현을 제공해야 한다.(함수 포인터로부터 디바이스에 종속적인 함수로 dereferencing함)
+
+### Block and character device files (2/4)
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
+- 주변 장치로 데이터를 전송하거나 주변 장치에서 데이터를 전송하는 순서는 다음과 같다.
+    - 읽기 또는 쓰기 시스템 콜은 일반적으로 장치 파일의 i-노드에 액세스합니다.
+    - 시스템은 i-노드 구조 내의 플래그를 확인하여 장치가 블록 장치인지 문자 장치인지 확인합니다. 메이저 번호도 추출됩니다. **->** major(inode->i_rdev)
+    - 메이저 번호는 적절한 장치 구성 표(device configuration table)에 대한 인덱싱에 사용되고 장치별 드라이버 루틴이 호출되어 데이터 전송을 수행합니다. **->**(*(cdevsw[major(dev)].d_write))(dev, … )
+
+마이너 장치 번호도 i-노드에 저장되고 장치 드라이버 루틴에 전달되어 여러 주변 포트를 지원하는 장치에서 액세스되는 포트를 정확히 식별합니다.
+
+* 커널은 디바이스를 명명하기 위해 번호를 붙인다.
+* 사용자는 디바이스를 명명하기 위해 pathname을사용(디바이스 파일), 이로 인해 디바이스를 일반 파일과 같이 취급할 수 있음.
+* 입출력 서브 시스템은 커널과 사용자 이름 공간사이의 의미를 정의하며, 그들 사이의 매핑을 수행.
+* 커널은 디바이스 유형(블록, 문자)과 주, 부 디바이스 번호라 불리는 한 쌍의 번호에 의해 각 디바이스를 식별
+* Major device number
+    - device 의 종류, 즉, 드라이버를 나타낸다.
+* minor device number
+    - 디바이스의 특정한 인스턴스를 나타낸다. 
+* 블록과 문자 디바이스는 그들 자신의 독립적인 주 번호들의 집합을 가짐. 따라서 블록 디바이스에 대한 주 번호 5는 디스크 드라이버를 가리킬 수 있고 문자 디바이스에 대한 주 번호 5는 라인 프린터를 가리킬 수 있다.
+* 사용자를 위한 디바이스 파일은 수퍼유저만이 생성할 수 있다. mknod임.
+>mknod(path, mode, dev)
+
+### Block and character device files (3/4)
+```c
+struct stat {
+       mode_t    st_mode;    /* file type & mode (permissions) */
+       ino_t     st_ino;     /* i-node number (serial number) */
+       dev_t     st_dev;     /* device number (file system) */
+       dev_t     st_rdev;    /* device number for special files */
+       nlink_t   st_nlink;   /* number of links */
+       uid_t     st_uid;     /* user ID of owner */
+       gid_t     st_gid;     /* group ID of owner */
+       off_t     st_size;    /* size in bytes, for regular files */
+       time_t    st_atime;   /* time of last access */
+       time_t    st_mtime;   /* time of last modification */
+       time_t    st_ctime;   /* time of last file status change */
+       blksize_t st_blksize; /* best I/O block size */
+       blkcnt_t  st_blocks;  /* number of disk blocks allocated */
+     };
+```
+이전에 봤던 stat 구조체  
+stat 시스템 콜로 파일 네임, 스트럭트 스탓 포인터 해서 아이노드 정보들을 가져오는데,  
+st_mode는 퍼미션 정보(4비트 파일 타입 3비트 sgt, 유저,그룹,아더스 퍼미션)  
+st_ino 아이노드 넘버  
+st_rdev 리얼 디바이스의 메이저, 마이너 넘버  
+st_dev 디바이스 파일이 저장되어 있는 디스크의 메이저, 마이너 넘버
+
+### Block and character device files (4/4)
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG030.jpg "그림09"){: .align-center}
+참고, 메이저(장치 종류)와 마이너(동일 장치별 개별 번호) 넘버가 필요한 이유  
+유닉스는 각 디바이스가 오퍼레이션(연산)들을 구현하도록 요구하고 있다.  
+이러한 연산들은 struct cdevsw[] 이나 struct bdevsw[]에 캡슐화되어 있다.  
+Struct cdevsw나 struct bdevsw의 각 필드는 추상화된 디바이스에 대한 인터페이스를 가지고 있다.  
 ![그림10](https://ji-hun-park.github.io/assets/images/LNXIMG031.jpg "그림10"){: .align-center}
+예제, 한 번 볼 것
+
+## The stat structure revisited
+### The stat structure revisited (1/3)
+**st_mode**  
+- 해당 파일 이름과 해당 i-노드를 포함하는 파일 시스템의 장치 번호입니다.
 ![그림11](https://ji-hun-park.github.io/assets/images/LNXIMG032.jpg "그림11"){: .align-center}
 ![그림12](https://ji-hun-park.github.io/assets/images/LNXIMG033.jpg "그림12"){: .align-center}
+```
+$ ls -lL /dev/tty[01] /dev/hda[34]
+brw-------  1 root   3, 3 Dec 31  1969 /dev/hda3
+brw-------  1 root   3, 4 Dec 31  1969 /dev/hda4
+crw-------  1 root   4, 0 Dec 31  1969 /dev/tty0
+crw-------  1 root   4, 1 Jan 18 15:36 /dev/tty1
+```
+스탓 다시 보기  
+st_mode 퍼미션 총 16비트(2바이트)  
+파일 타입은 총 7가지, 비트별 파일 타입을 알아보기 힘드니 매크로를 준비해 놓음  
+if(S_ISREG(sb.st_mode)) 이게 트루면 레귤러 타입 파일  
+이즈 캐릭터(S_ISCHR) – 캐릭터 디바이스 파일이면 트루 아니면 펄스  
+나머지도 마찬가지
+
+### The stat structure revisited (2/3)
+**struct stat**
+- st_mode
 ![그림13](https://ji-hun-park.github.io/assets/images/LNXIMG034.jpg "그림13"){: .align-center}
+```c
+switch(stat->st_mode & S_IFMT){
+    case S_IFBLK:
+    case S_IFCHR:
+    case S_IFIFO:
+    case S_IFREG:
+    case S_IFDIR:
+    case S_IFLNK:
+    case S_IFSOCK:
+}
+```
+- S_IFMT Type of file.
+    - S_IFBLK - Block special. 
+    - S_IFCHR - Character special.
+    - S_IFIFO - FIFO special. 
+    - S_IFREG - Regular. 
+    - S_IFDIR - Directory. 
+    - S_IFLNK - Symbolic link. 
+    - S_IFSOCK - Socket.
+
+또 다른 방법으로 아이노드 값을 스탓으로 가져와서 stat.h에 정의되어 있는 값들을 이용한다.  
+S_IFMT와 비트와이즈앤드 연산으로 앞 4비트만 가져온다.  
+각각의 케이스로 구분할 수 있다.
+
+### The stat structure revisited (3/3)
+- st_rdev
+    - 문자 특수 파일과 블록 특수 파일만 `st_rdev` 값을 갖습니다.
+    - 매크로 major와 minor는 대부분 구현(implementations)에서 정의됩니다. (`<sys/types.h>`)
+
+```c
+int main(int argc, char *argv[]) {
+   int i; 
+   struct stat buf; 
+   stat(argv[1], &buf);
+
+   printf("dev = %d/%d", major(buf.st_dev), minor(buf.st_dev)); 
+
+   if (S_ISCHR(buf.st_mode) || S_ISBLK(buf.st_mode)) { 
+      printf(" (%s) rdev = %d/%d",(S_ISCHR(buf.st_mode))?"character":"block" 
+                                 , major(buf.st_rdev)
+                                 , minor(buf.st_rdev)); 
+   } 
+   printf("\n"); 
+   exit(0); 
+}
+```
+리얼 디아비스 메이저, 마이너 넘버가 있는 곳.  
+오직 캐릭터, 블록 스폐셜 파일만이 해당 값을 가진다.  
+시스템 안 타입스(types) 헤더를 인클루드하고,  
+메이저와 마이너 위치를 찾아서 번호를 가져오는 매크로가 있다.
+
+buf에 아이노드 정보가 들어가고,  
+그 값을 메이저와 마이너에 넣으면 해당 장치의 파일이 들어있는 디스크의 대한 메이저, 마이너 넘버가 나온다.
+
+이제 이즈캐릭터와 이즈블록으로 디바이스 파일인지 판별한다.  
+디바이스 파일에만 있는 rdev 값으로 캐릭터가 트루면 캐릭터, 펄스면 블록이다.  
+이후 rdev를 메이저와 마이너에 넣어서 값을 알아낸다.
+
+## 작성중
 ![그림14](https://ji-hun-park.github.io/assets/images/LNXIMG035.jpg "그림14"){: .align-center}
 ![그림15](https://ji-hun-park.github.io/assets/images/LNXIMG036.jpg "그림15"){: .align-center}
 
