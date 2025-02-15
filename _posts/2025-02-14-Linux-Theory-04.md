@@ -911,9 +911,158 @@ buf에 아이노드 정보가 들어가고,
 디바이스 파일에만 있는 rdev 값으로 캐릭터가 트루면 캐릭터, 펄스면 블록이다.  
 이후 rdev를 메이저와 마이너에 넣어서 값을 알아낸다.
 
-## 작성중
+## File system information
+### File system information (1/2)
+```c
+#include <sys/statvfs.h>
+
+int fstatvfs(int fildes, struct statvfs *buf);
+int statvfs(const char *path, struct statvfs *buf);
+
+//Returns: 0 if OK, -1 on error
+```
+- **statvfs**와 **fstatvfs**를 호출하면 총 여유 디스크 블록 수, 여유 i-노드 수와 같은 기본적인 파일 시스템 정보를 얻을 수 있습니다.
+
+```c
+struct statvfs {
+    unsigned long f_bsize    	File system block size. 
+    unsigned long f_frsize   	Fundamental file system block size. 
+    fsblkcnt_t    f_blocks	Total number of blocks on file system in units of f_frsize. 
+    fsblkcnt_t    f_bfree    	Total number of free blocks. 
+    fsblkcnt_t    f_bavail   	Number of free blocks available to non-privileged process. 
+    fsfilcnt_t    f_files    	Total number of file serial numbers. (#inodes)
+    fsfilcnt_t    f_ffree    	Total number of free file serial numbers. 
+    fsfilcnt_t    f_favail   	Number of file serial numbers available to non-privileged process. 
+    unsigned long f_fsid     	File system ID. 
+    unsigned long f_flag     	Bit mask of f_flag values. 
+    unsigned long f_namemax  	Maximum filename length.      
+}
+```
+시스템 에러 정보(생략)
+
+### File system information (2/2)
+**f_flag**  
 ![그림14](https://ji-hun-park.github.io/assets/images/LNXIMG035.jpg "그림14"){: .align-center}
+- f_bsize
+    - 파일 시스템 블록 크기(바이트). 이 숫자는 디스크 단위 스토리지 블록의 바이트 수입니다.
+- f_frsize
+    - 디스크 주소가 계산되는 단위입니다. UFS의 경우 512 또는 1K 바이트가 될 수 있습니다.
+
+파일 시스템 에러 정보(생략)
+
+### example
+```c
+/* fsys -- 파일 시스템 정보를 프린트한다. */
+/* 파일 시스템 이름이 인자로 전달된다. */
+#include <sys/statvfs.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+main (int argc, char **argv)
+{
+   struct statvfs buf;
+
+   if (argc != 2)
+   {
+      fprintf (stderr, "usage: fsys filename\n");
+      exit (1);
+   }
+   if (statvfs (argv[1], &buf) !=0)
+   {
+      fprintf (stderr, "statvfs error\n");
+      exit (2);
+   }
+   
+   printf ("%s:\tfree blocks %d\tfree inodes %d\n",
+ 		     argv[1], buf.f_bfree, buf.f_ffree);
+   exit (0);
+}
+```
+사용 예제 정보(스탓이랑 비슷하다, 생략)
+
+## Limits
+### Limits (1/4)
+- 두 가지 유형의 제한이 필요합니다.
+    - 컴파일 타임 제한(예: 짧은 정수의 가장 큰 값은?)
+    - 런타임 제한(예: 파일 이름의 문자 수는?)
+
+- 이러한 문제를 해결하기 위해 세 가지 유형의 제한이 제공됩니다.
+    - 컴파일 타임 제한(헤더)
+    - 파일이나 디렉터리와 연관되지 않은 런타임 제한(sysconf 함수)
+    - 파일이나 디렉터리와 연관된 런타임 제한(pathconf 및 fpathconf 함수)
+
+### Limits (2/4)
+```c
+#include <unistd.h>
+
+long sysconf(int name);
+long pathconf(const char *pathname, int name);
+long fpathconf(int filedes, int name);
+ 
+//All three return: corresponding value if OK, -1 on error (see later)
+```
 ![그림15](https://ji-hun-park.github.io/assets/images/LNXIMG036.jpg "그림15"){: .align-center}
+`_SC_`로 시작하는 상수는 **sysconf**의 인자로 사용됩니다.  
+`_PC_`로 시작하는 상수는 **pathconf** 및 **fpathconf**의 인자로 사용됩니다.
+
+- Limit이 결정 안되는 경우, 
+    - sysconf()는 -1을 리턴.
+    - 하지만, errno=0임
+- Limitm 결정이 안되는 상황
+    - `<limits.h>`정의가 안되어 있을 경우(compile-time에 결정이 안됨)
+    - runtime에 결정 안될 수도 있다.
+
+### example
+```c
+#include <unistd.h>
+#include <stdio.h>
+
+typedef struct{
+   int val;
+   char *name;
+} Table;
+
+main()
+{
+   Table *tb;
+   static Table options[] = {
+ 	{ _PC_LINK_MAX, "Maximum number of links"},
+ 	{ _PC_NAME_MAX, "Maximum length of a filename"},
+ 	{ _PC_PATH_MAX, "Maximum length of pathname"},
+ 	{-1, NULL}
+   };
+
+   for (tb=options; tb->name != NULL; tb++)
+      printf ("%-28.28s\t%ld\n", tb->name, pathconf ("/tmp", tb->val));
+}
+```
+```
+Maximum number of links		32767
+Maximum length of a filename	256
+Maximum length of a pathname	1024
+```
+생략
+
+### Limits (3/4)
+**sysconf 시스템 콜**  
+- 런타임에 다음 두 가지를 확인합니다.
+    - 시스템 전체 옵션 확인
+    - 구현에 따른 제한 확인
+- 일반적으로 구현 시스템에 대한 정보를 얻는 데 사용됩니다.
+- -1 반환(return)
+    - errno = **EINVAL**: 잘못된 심볼
+    - errno가 변경되지 않음
+        - 옵션이 지원되지 않음(옵션 확인)
+        - 제한이 없음(제한 확인)
+    - errno가 변경된 경우에만 -1은 오류를 의미합니다.(에러가 안나더라도, limit을 결정할 수 없을때 errno는 설정되지 않는다.)  
+    - <span style="color:red">따라서 호출하기 전에 errno를 0으로 설정해야 합니다.</span>
+
+### Limits (4/4)
+- fpathconf와 pathconf
+    - 파일에 대한 정보를 얻는 데 사용됩니다.
+    - fathconf는 열린 파일이 있을 때 사용됩니다.
+    - pathconf는 닫힌 파일이 있을 때 사용됩니다.
+    - 반환 값의 해석은 sysconf와 동일합니다.
 
 ## 마무리
 이상으로 Linux 이론의 디렉터리편을 마치겠습니다.  
