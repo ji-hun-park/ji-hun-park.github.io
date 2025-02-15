@@ -445,8 +445,30 @@ s1이 더 길다는 전제 조건 하에 스트링컴페어(strcmp)를 한다.(�
 
 - 유닉스 프로세스는 자신만의 current working directory를 가진다.
 - 사용자와 관련된 current directory는 실제로는 사용자의 명령을 해석하는 shell process의 current working directory이다.
-- 대부분  process의 current working 디렉터리는 사용자의 명령을 입력받아서 프로세스를 실행시킨 쉘 프로세스의 current working 디렉터리가 상속된다.
+- 대부분  process의 current working 디렉터리는 사용자의 명령을 입력받아서 프로세스를 실행시킨 셸 프로세스의 current working 디렉터리가 상속된다.
 
+## The chdir(2) system call
+```c
+#include <unistd.h>
+
+int chdir(const char *path);
+
+//Return: 0 if OK, -1 on error
+```
+- 이 변경 사항은 `chdir`을 만드는 프로세스에만 적용됩니다.
+- 오류
+    - `path`가 유효한 디렉터리를 정의하지 않음
+    - 실행 권한이 모든 구성 요소 디렉터리에 존재하지 않음
+- 디렉터리를 변경하고 이 새 디렉터리에 상대적인 파일명을 사용하는 것이 절대적 파일명을 사용하는 것보다 효율적입니다.
+```c
+fd1 = open(“/usr/ben/abc”, O_RDONLY);
+fd2 = open(“/usr/ben/xyz”, O_RDWR);
+```
+```c
+chdir(“/usr/ben”);
+fd1 = open(“abc”, O_RDONLY);
+fd2 = open(“xyz”, O_RDWR);
+```
 ## 작성중
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG030.jpg "그림09"){: .align-center}

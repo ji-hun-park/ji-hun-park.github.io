@@ -6,10 +6,10 @@ main:
     url: /tags/
   - title: "About"
     url: /about/
-  - title: "GitHub"
-    url: https://github.com/ji-hun-park
-  - title: "LinkedIn"
-    url: https://www.linkedin.com/in/%EC%A7%80%ED%9B%88-%EB%B0%95-62424828a/
+  - title: "Simple CS"
+    url: /cs/
+  - title: "Portfolio"
+    url: /portfolio/
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
