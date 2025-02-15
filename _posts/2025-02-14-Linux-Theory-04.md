@@ -319,7 +319,7 @@ struct dirent *readdir(DIR *dp);
 읽을 때도 `readdir` 이라는 라이브러리 사용, `<dirent.h>` 인클루드하고,  
 struct dirent *readdir (DIR *dp); 성공하면 디렉터리 포인터, 실패(또는 EOD, 엔드 오브 디렉터리)하면 널 리턴
 
-디렉터리 엔트리 구조체 안에 dino, dname 2개의 맴버 변수가 있다.  
+디렉터리 엔트리 구조체 안에 d_ino, d_name 2개의 맴버 변수가 있다.  
 읽으면 엔트리 하나가 넘어온다,  
 파일 오프셋이 읽은 만큼 이동하면서 다음 엔트리를 가리킨다.
 
@@ -346,25 +346,32 @@ int my_double_ls (const char *name){
    struct dirent *d;
    DIR *dp;
 
-   /* 디렉토리를 개방하고, 실패여부를 점검함 */
+   /* 디렉터리를 개방하고, 실패여부를 점검함 */
    if ((dp=opendir(name)) == NULL)
    return (-1);
 
-   /* 디렉토리를 살피면서 루프, 이때 inode번호가 유효하면 디렉토리항을 프린트 */
+   /* 디렉터리를 살피면서 루프, 이때 inode번호가 유효하면 디렉터리항을 프린트 */
    while (d = readdir(dp)){
       if (d->d_ino !=0)
          printf ("%s\n", d->d_name);
    }
 
-   rewinddir(dp); /*이제 디렉토리의 시작으로 되돌아간다 ... */
+   rewinddir(dp); /*이제 디렉터리의 시작으로 되돌아간다 ... */
  
-   while (d = readdir(dp)){/* ... 그리고 디렉토리를 다시 프린트한다. */
+   while (d = readdir(dp)){/* ... 그리고 디렉터리를 다시 프린트한다. */
       if (d->d_ino != 0)
          printf ("%s\n", d->d_name);
    }
   closedir (dp);
 }
 ```
+double_ls(목록을 한 번 출력하고 같은 목록을 한 번 더 출력하는 기능)
+
+디렉터리 엔트리 구조체형 포인터 d가 있고, 디렉터리 포인터 dp가 있다.  
+디렉터리 이름을 받아서 오픈해서 디렉터리 포인터를 받고(널이면 리턴 –1),  
+성공하면 d에다 dp를 읽기(readdir)해서 i넘버가 0이 아니면 읽은 이름을 출력한다.  
+이걸 EOD(널이면 0)까지 반복하고, 다시 리와인더(rewinddir)로 오프셋을 초기화 한다, 맨 처음부터 다시 읽는다.  
+다시 앞에 거를 반복, 널이 리턴되면 false라 종료된다, 이후 디렉터리를 닫고 프로그램을 종료한다.
 
 ### example (2/2)
 ```c
@@ -405,6 +412,40 @@ int match (const char *s1, const char *s2)
 }
 ```
 ![그림16](https://ji-hun-park.github.io/assets/images/LNXIMG037.jpg "그림16"){: .align-center}
+`dirname`이란 폴더(디렉터리) 아래 파일에서 주어진 접미사(suffix)로 끝나는 첫 번째 파일을 찾는 것이 find_entry 함수의 기능이다.  
+aaa bbb.txt ccc.txt dddd 가 있을 때 *suffix 값을 “.txt”로 주면 저걸로 끝나는 파일을 찾는데,  
+기본은 첫 번째를 찾고, cont로 순서를 바꾼다(cont가 1이면 다음으로 가고, 0이면 처음 거).
+
+dp와 d는 본래 지역 변수(해당 펑션 안에서만 유효, 펑션 실행 시 메모리가 생성, 펑션 종료 시 날아간다)인데,  
+static을 통해 펑션 실행 전에 미리 메모리를 할당해서 펑션을 실행하고, 나갔다 들어와도 전의 값을 그대로 갖고 있는다.
+
+처음 실행 시 초깃값이 널이므로 오아(or) 뒤에 것은 안 보고, `opendir`로 오픈한다.  
+널이 아니면 디렉터리 엔트리를 읽어들인다.  
+ino가 0이면 없는 엔트리니 다음으로 스킵한다.  
+이름과 서픽스를 비교해 서픽스가 있는지 체크한다.  
+서픽스를 찾으면 네임을 리턴한다.  
+하나도 못 찾으면 `closedir`한다.
+
+두 번째 들어올 때는 dp가 널이 아니다(스태틱 때문에), cont가 0이므로 true(cont가 0이 아니면 close해서 다시 찾는다).  
+cont가 1이면 저걸 skip하고 다음 걸 읽는다.
+
+match는 두 번째 인자 suffix, 첫 번째 인자 파일명.  
+우선 변수 diff로 두 캐릭터 배열의 length(마지막 널은 포함 안 함)를 뺀다.  
+그러면 앞의 길이만 남는다.(4)  
+s1이 더 길다는 전제 조건 하에 스트링컴페어(strcmp)를 한다.(두 문자열이 같은지 비교하는 함수)  
+여기서 diff만큼 뒤에서 point해서 주소를 주고, 둘이 같으면(0이 되면) true를, 아니면 false를 return한다.
+
+## The current working directory
+각 UNIX 프로세스에는 자신의 고유한 현재 작업 디렉터리(current working directory)가 있습니다.  
+커런트 디렉터리 혹은 워킹 디렉터리라고도 합니다.  
+사용자와 명확하게 연관된 것으로 보이는 현재 디렉터리는 실제로 해당 사용자의 명령을 해석하는 셸 프로세스와 연관된 현재 작업 디렉터리입니다.  
+셸에 커멘드를 치면 이게 프로세스가 되어, 처음 프로세스의 현재 작업 디렉터리는 프로세스가 시작된 프로세스의 현재 작업 디렉터리로 설정됩니다.  
+(커멘드를 해석하고 있는 쉘 프로세스가 작동하는 현재 디렉터리)  
+초기에 어떤 프로세스의 워킹 디렉터리는 보통 셸 워킹 디렉터리랑 같아집니다.
+
+- 유닉스 프로세스는 자신만의 current working directory를 가진다.
+- 사용자와 관련된 current directory는 실제로는 사용자의 명령을 해석하는 shell process의 current working directory이다.
+- 대부분  process의 current working 디렉터리는 사용자의 명령을 입력받아서 프로세스를 실행시킨 쉘 프로세스의 current working 디렉터리가 상속된다.
 
 ## 작성중
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
