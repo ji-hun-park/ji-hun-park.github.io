@@ -455,11 +455,12 @@ int chdir(const char *path);
 
 //Return: 0 if OK, -1 on error
 ```
-- 이 변경 사항은 `chdir`을 만드는 프로세스에만 적용됩니다.
+- 이 변경 사항은 `chdir`을 만드는 프로세스에만 적용됩니다.(current working directory 변경)
+    - 다른 프로세스에 영향을 미치지 않는다.
 - 오류
     - `path`가 유효한 디렉터리를 정의하지 않음
     - 실행 권한이 모든 구성 요소 디렉터리에 존재하지 않음
-- 디렉터리를 변경하고 이 새 디렉터리에 상대적인 파일명을 사용하는 것이 절대적 파일명을 사용하는 것보다 효율적입니다.
+- 디렉터리를 변경하고 이 새 디렉터리에 상대적인 파일명을 사용하는 것이 절대적인 파일명을 사용하는 것보다 효율적입니다.
 ```c
 fd1 = open(“/usr/ben/abc”, O_RDONLY);
 fd2 = open(“/usr/ben/xyz”, O_RDWR);
@@ -469,6 +470,187 @@ chdir(“/usr/ben”);
 fd1 = open(“abc”, O_RDONLY);
 fd2 = open(“xyz”, O_RDWR);
 ```
+명령어 cd와 비슷한 시스템 콜, 프로세스의 워킹 디렉터리를 바꿔준다(절대, 상대 패스네임)  
+해당 시스템 콜을 적용한 프로세스에만 적용(셸과 무관)  
+오픈할 때 절대 경로명을 주면 길어서 귀찮은데, 체인지 디렉터리로 상대 경로명을 주면 편하다.
+
+## The getcwd(3)
+```c
+#include <unistd.h>
+
+char *getcwd(char *name, size_t size);
+
+//Returns: name if OK, NULL on error
+```
+- 현재 디렉터리 경로 이름에 대한 포인터를 반환합니다.
+- 현재 디렉터리 이름은 `name`이 가리키는 배열에 복사됩니다.
+- `name` 할당 문제
+    - 구현은 시스템에 따라 다릅니다.
+    - POSIX.1은 PATH_MAX 값(`<limits.h>`)을 지원하려 합니다.
+    - 할당된 공간이 너무 작으면 오류가 반환되고 errno가 **ERANGE**로 설정됩니다.
+
+\$ pwd 명령으로 현재 워킹 디렉터리를 볼 수 있는데 `getcwd` 라이브러리가 이와 유사하다.  
+`<unistd.h>`를 인클루드하고,  
+char *getcwd(char *name, size_t size); 성공하면 네임을 리턴, 실패하면 널을 리턴한다.  
+첫 번째 인자가 리턴된다, 두 번째 인자는 최대 사이즈다.
+
+현재 디렉터리의 패스네임을 포인터로 넘겨준다.  
+그걸 저 첫 번째 인자에도 넘겨준다(양 쪽으로).  
+문제는 시스템마다 버전이 조금씩 다르다, POSIX.1은 PATH_MAX 값을 지원하려 한다.
+
+### example
+```c
+/* my_pwd -- 작업 디렉터리를 프린트한다.*/
+
+#include <stdio.h>
+#include <unistd.h>
+#define VERYBIG 200
+
+void my_pwd (void);
+
+main()
+{
+   my_pwd();
+}
+
+void my_pwd (void)
+{
+   char dirname[VERYBIG];
+
+   if ( getcwd(dirname, VERYBIG) == NULL)
+ 	perror("getcwd error");
+   else
+ 	printf("%s\n", dirname);
+}
+```
+메인에서 my_pwd 함수 실행, 캐릭터형 dirname 크기를 충분히 잡고 getcwd에 인자로 준다.  
+경로명을 출력하는 간단한 프로그램
+
+## The ftw(3)
+### The ftw(3) (1/2)
+```c
+#include <unistd.h>
+
+int ftw(const char *path, int (*func)(), int depth);
+
+//Returns: 0 if OK, -1 on error
+```
+- 임의의 디렉터리에서 시작하여 디렉터리 트리 탐색을 수행하고, 발견된 각 디렉터리 항목에 대해 사용자 정의 루틴을 호출합니다.
+- ftw의 종료 조건
+    - 사용자 정의 함수가 0이 아닌 값을 반환할 때
+    - 오류가 발생했을 때
+    - 트리의 맨 아래에 도달했을 때
+- 인자(Argument)
+    - path : 디렉터리 경로 이름
+    - depth : 다른 파일 서술자의 수를 제어함.
+    - func : 사용자 정의 함수
+
+### The ftw(3) (2/2)
+```c
+int func(const char *name, const struct stat *sptr, int type)
+{
+	/* body of function */
+}
+```
+- 인자(argument)
+    - name : 객체 이름
+    - sptr : 객체에 대한 stat 구조
+    - type <ftw.h>
+        - FTW_F 파일
+        - FTW_D 디렉터리
+        - FTW_DNR 읽을 수 없는 디렉터리.
+        - FTW_SL 심볼릭 링크.
+        - FTW_NS 심볼릭 링크가 아니며, stat를 성공적으로 실행할 수 없음.(stat(2) 오류)
+
+### 예제
+```c
+#include <sys/stat.h>
+#include <ftw.h>
+
+int list(const char *name, const struct stat *status, int type)
+{
+   if (type == FTW_NS) /* 만일 stat 호출이 실패하면, 그냥 복귀한다. */
+      return 0;
+ /* 아니면 객체이름, 허가 그리고 객체가 디렉터리이거나 상징형 링크면 뒤에 “*”를 첨가*/
+   if(type == FTW_F)
+      printf("%-30s\t0%3o\n", name, status->st_mode&0777);
+   else
+      printf("%-30s*\t0%3o\n", name, status->st_mode&0777);
+
+   return 0;
+}
+
+int main (int argc, char **argv){
+   int list(const char *, const struct stat *, int);
+
+   if (argc == 1)
+      ftw (".", list, 1);
+   else
+      ftw (argv[1], list, 1);
+   exit (0);
+}
+```
+```c
+$ list
+.			*   	0755
+./list		        *  	0755
+./file			        0644
+./subdir		*	0777
+./subdir/another		0644
+./subdir/subdir2	*	0755
+./subdir/yetanother		0644
+```
+이 부분은 생략합니다.
+
+# 4.5 UNIX file systems
+## Caching sync and fsync
+- 유닉스 파일 시스템에서 유용한 명령어
+- 메모리에서 디스크로의 모든 전송, 즉 쓰기는 일반적으로 디스크에 즉시 기록되는 것 대신 운영 체제의 데이터 공간에 캐시됩니다.
+- 읽기도 캐시 내에 버퍼링됩니다.
+- UNIX는 버퍼의 데이터를 디스크에 쓰는 두 가지 함수를 제공합니다.
+- sync
+    - 파일 시스템에 대한 정보가 포함된 모든 주 메모리 버퍼를 디스크에 플러시(flush, 물내리기)하는 데 사용됩니다.
+- fsync
+    - 특정 파일과 관련된 모든 데이터와 속성을 플러시하는 데 호출됩니다.
+
+프로그램을 실행하면 디스크 메모리에 업데이트가 된다,  
+라이트 시스템 콜을 써서 I/O하다, 메모리 버퍼에 디스크에 라이트하지 않은 것들이 남아있는 경우가 종종 있다.  
+메모리 버퍼뿐 아니라 OS 커널 버퍼도 있는데, 시스템 실행 중에 전원이 나가거나 갑자기 종료되면 작업한 것들이 날아간다.  
+리드도 마찬가지로 캐시가 버퍼된다.
+
+그래서 주기적으로 flush, flush out 즉, 버퍼에 있는 내용을 다 디스크에 write시킨다.  
+sync는 파일 시스템 전체에 대해 메인 메모리 버퍼에 남아있는 내용을 디스크에 write한다.  
+fsync는 특정한 파일 하나 하나(파일 디스크립터가 가리키는) 버퍼에 있는 내용을 디스크에 write시켜준다.
+
+wirte와 같은 메모리로부터 디스크로의 모든 전송은 일반적으로 디스크에 즉시 write되는 대신에 operating system’s data space(메모리)에 캐쉬(cache)된다.  
+read도 마찬가지로 cache에 buffered된다.  
+유닉스는 cached된 데이터를 disk로 write하기 위해 두개의 system call을 제공한다, sync와 fsync이다.  
+sysnc는 모든 파일시스템에 있는 buffere된 내용을 disk로 write한다.   
+fsync는 특별한 파일과 관련된 모든 데이터와 에트리뷰트들을 flush한다.
+
+## The sync(2) & fsync(2) system call
+```c
+#include <unistd.h>
+
+int fsync(int filedes);
+ 
+//Returns: 0 if OK, -1 on error
+void sync(void);
+```
+- 둘의 중요한 차이점
+    - fsync는 모든 파일 데이터가 디스크에 쓰여질 때까지 반환되지 않습니다.
+    - sync 호출은 데이터 쓰기가 예약되었지만, 완료되지 않은 경우에도 반환될 수 있습니다.
+        - 단지 운영체제에 스케줄을 요청한다, 따라서 바로 리턴된다.
+- UNIX 시스템은 `sync`를 반복적으로 호출하는 코드를 지속적으로 실행합니다.
+
+둘 다 시스템 콜, `<unistd.h>` 인클루드하고,  
+int fsync(int filedes); void sync(void); 리턴 값은 성공 시 0, 실패 시 –1  
+싱크는 인자 없음, 에프싱크는 파일 디스크립터 값을 줌  
+
+에프싱크는 특정 파일에 대해서만 하는 것이기에 디스크에 모든 데이터가 플러시 아웃(flush out)될 때까지 리턴이 안 된다.  
+싱크는 즉각 리턴된다(모든 데이터 write이 스케쥴되고 완료되지 않아도).  
+유닉스 시스템은 OS 차원에서 싱크를 주기적으로 실행시켜준다.
+
 ## 작성중
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG029.jpg "그림08"){: .align-center}
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG030.jpg "그림09"){: .align-center}
