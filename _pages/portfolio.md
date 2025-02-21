@@ -35,7 +35,15 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 **게임 흐름도**  
 ![그림35](https://ji-hun-park.github.io/assets/images/pofol035.png "그림35"){: .align-center}
 
+**보스 흐름도**  
+![그림36](https://ji-hun-park.github.io/assets/images/pofol036.png "그림36"){: .align-center}
+![그림37](https://ji-hun-park.github.io/assets/images/pofol037.png "그림37"){: .align-center}
+
 ### 플레이 방식
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
+
 ![그림08](https://ji-hun-park.github.io/assets/images/pofol008.png "그림08"){: .align-center}
 ![그림13](https://ji-hun-park.github.io/assets/images/pofol013.png "그림13"){: .align-center}
 ![그림11](https://ji-hun-park.github.io/assets/images/pofol011.png "그림11"){: .align-center}
@@ -68,10 +76,8 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 ![그림40](https://ji-hun-park.github.io/assets/images/pofol040.jpg "그림40"){: .align-center}
 
 보스의 HP가 0이 되면 엔딩 컷씬이 나오면서 게임 클리어입니다.  
-
-**보스 흐름도**  
-![그림36](https://ji-hun-park.github.io/assets/images/pofol036.png "그림36"){: .align-center}
-![그림37](https://ji-hun-park.github.io/assets/images/pofol037.png "그림37"){: .align-center}
+</div>
+</details>
 
 ### 사용 에셋
 유료 2D 픽셀 아트 모음 에셋, 음향 에셋, 무료 UI 에셋, 생성형 AI 이미지 등을 사용했습니다.
@@ -188,6 +194,10 @@ itch.io: [WhatIsAVaccine itch](https://jihunpark.itch.io/whatisavaccin)
 독이 퍼지기 전에 해당 공간의 AI를 통해 키워드를 알아내 스캐너에게 그림을 전송해 해독제를 얻어야 한다.
 
 ### 플레이 방식
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
+
 ![그림03](https://ji-hun-park.github.io/assets/images/pofol003.png "그림03"){: .align-center}
 ![그림04](https://ji-hun-park.github.io/assets/images/pofol004.png "그림04"){: .align-center}
 ![그림05](https://ji-hun-park.github.io/assets/images/pofol005.png "그림05"){: .align-center}
@@ -202,6 +212,8 @@ itch.io: [WhatIsAVaccine itch](https://jihunpark.itch.io/whatisavaccin)
 * 맵 중앙 스크린에 상호 작용한 후 캔버스에 키워드를 연상시키는 그림을 그려 저장 후 전송
 * 스캐너에게 말을 걸면 그림을 보고 해석한 답변을 내놓고, 키워드와 일치하는 부분은 빨간색으로 표시
 * 키워드가 포함되면 클리어, 없으면 게임 오버
+</div>
+</details>
 
 ### 사용 에셋
 무료 3D 에셋을 사용했습니다.
@@ -257,11 +269,15 @@ FixedUpdate 문으로 변경해 해결했습니다.
 여러 기믹들이 존재하며, 다회차 플레이를 통해 최고점을 갱신할 수 있습니다.
 
 ### 플레이 방식
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 WASD, 방향키로 이동하며, 스페이스 바로 점프, 마우스 좌클릭으로 공격이 가능합니다.  
 마우스를 길게 눌러 차징 공격이 가능합니다.  
 공격에는 코스트가 소모되며, 피격 시에도 코스트가 소모돼, 0이 되면 게임 오버입니다.  
 신전이 있으며, 주변에 있으면 점령이 되어 일정 시간동안 코스트가 천천히 회복됩니다.
-
+</div>
+</details>
 ### 난관들
 유니티도 아직 익숙지 않았고, 팀플은 처음이었기에 깃 사용이나, 기능 구현이 어려웠습니다.  
 그래서 저는 깃을 잘모르는 팀원에게 깃의 기능을 설명해 가르쳐 주었고,  
@@ -288,6 +304,9 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 해당 기능을 활용해 전투를 유리하게 진행할 수 있습니다.
 
 ### 플레이 방식
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ![그림00](https://ji-hun-park.github.io/assets/images/pofol000.png "그림00"){: .align-center}
 ![그림01](https://ji-hun-park.github.io/assets/images/pofol001.png "그림01"){: .align-center}
 ![그림02](https://ji-hun-park.github.io/assets/images/pofol002.png "그림02"){: .align-center}
@@ -299,7 +318,8 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 * A를 누른 후 적을 누르면 적을 중심으로 원형으로 산개합니다. 다시 A를 눌러 취소할 수 있습니다.
 </div>
 </details>
-
+</div>
+</details>
 ## MakeSomeStory
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
@@ -315,6 +335,9 @@ Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_
 이미지와 컨셉을 입력해 이야기를 생성하는 앱입니다.
 
 ### 플레이 방식
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ![그림17](https://ji-hun-park.github.io/assets/images/pofol017.png "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/pofol018.png "그림18"){: .align-center}
 ![그림19](https://ji-hun-park.github.io/assets/images/pofol019.png "그림19"){: .align-center}
@@ -327,7 +350,8 @@ LLM이 이야기를 자동으로 생성해 화면에 보여줍니다.
 메뉴에서 생성된 이야기들을 볼 수 있습니다.
 </div>
 </details>
-
+</div>
+</details>
 ## etc.
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
