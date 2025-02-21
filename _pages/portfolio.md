@@ -3,13 +3,16 @@ title: "Portfolio"
 permalink: /portfolio/
 layout: single
 toc: true
+toc_sticky: true
 toc_label: "목차"
 ---
 
 # Game Client Portfolio
 
 ## ForTheGranada
-
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ### Links
 Download: [ForTheGranada GoogleDrive](https://drive.google.com/drive/folders/1O5f4WLxdKuyVzdOm2uxCYTrPCpUg5eTf?usp=sharing)  
 GamePlay Video: [ForTheGranada Youtube](https://www.youtube.com/watch?v=3aYrso13pHI)  
@@ -159,8 +162,13 @@ Resoruces 디렉터리에서 파일명에 해당하는 Texture2D를 가져와 �
 그래서 각 기능 별로 다른 매니저로 나누어 함수들을 분리했습니다.
 
 그 밖에도 중복되는 부분을 하나의 함수로 묶거나, 변수를 읽기 전용으로 제한하거나 상수로 바꾸거나, Update 문의 호출을 event등을 이용해 줄이는 시도를 했습니다.
+</div>
+</details>
 
 ## WhatIsAVaccine
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ### Links
 Download: [WhatIsAVaccine GoogleDrive](https://drive.google.com/file/d/1UxYPVTVv3ubTJkSkJFCheksu-1MviBIz/view?usp=sharing)  
 Play Video: [WhatIsAVaccine Play Video](https://youtu.be/HhLgUsnNSzc)  
@@ -225,8 +233,13 @@ C#과 유니티의 event를 통해 Update문 호출을 줄였습니다.
 ### 코드 개선
 빌드 후 적이 너무 빨리 이동하는 현상이 있었는데, 일반 Update 문에서 이동한 것이 문제였기에  
 FixedUpdate 문으로 변경해 해결했습니다.
+</div>
+</details>
 
 ## MonochromeInvader
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ### Links
 타인의 private로 전환되었기 때문에 없습니다.
 
@@ -256,8 +269,13 @@ WASD, 방향키로 이동하며, 스페이스 바로 점프, 마우스 좌클릭
 
 ### 맡은 역할
 풀링 시스템, 부활, 룬, 저장 기능 구현
+</div>
+</details>
 
 ## ScatteredTroops
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ### Links
 Github: [Scattered-troops Git repository](https://github.com/ji-hun-park/Unity2D-Scattered-troops)  
 Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL6YTA2cz1Mr8_IMve9qQj_KtViny/view?usp=sharing)
@@ -279,8 +297,13 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 * 선택된 유닛들은 우클릭으로 이동시킬 수 있습니다.
 * 선택된 유닛들은 S를 통해 좁게, D를 통해 넓게 산개시킬 수 있습니다.
 * A를 누른 후 적을 누르면 적을 중심으로 원형으로 산개합니다. 다시 A를 눌러 취소할 수 있습니다.
+</div>
+</details>
 
 ## MakeSomeStory
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ### Links
 Github: [MakeSomeStory Git repository](https://github.com/ji-hun-park/ECommerce_Exam)  
 Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_WlWCnVanbBfses3WpokIHQHxeMNRtRy?usp=sharing)
@@ -302,10 +325,17 @@ Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_
 거기에 맞는 컨셉을 직접 입력 후 전송하면  
 LLM이 이야기를 자동으로 생성해 화면에 보여줍니다.  
 메뉴에서 생성된 이야기들을 볼 수 있습니다.
+</div>
+</details>
 
 ## etc.
+<details>
+<summary>클릭해서 펼치기 / 접기</summary>
+<div markdown="1">
 ![그림22](https://ji-hun-park.github.io/assets/images/pofol022.png "그림22"){: .align-center}
 
 대학교 동아리 내에서 입문자를 위한 스터디에 참여해 3D 타워디팬스를 제작했습니다.  
 해당 스터디에서 끝까지 남아 제작을 완료한 사람은 제가 **유일**했습니다.  
 그 밖에 비행 기능, Marching Cubes 알고리즘 구현 등을 연습했습니다.
+</div>
+</details>
