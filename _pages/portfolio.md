@@ -10,6 +10,7 @@ toc_label: "목차"
 # Game Client Portfolio
 
 ## ForTheGranada
+### [팀] Unity 2D Top View Adventure Game
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
@@ -25,6 +26,9 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 
 ### 프로젝트 개요
 대학교 종합설계(캡스톤) 졸업과제로 제작한 개발자 3인으로 구성된 팀프로젝트 게임입니다.
+
+### 제작 기간
+약 4개월 소요(개인 리팩토링 포함)
 
 ### 게임 소개
 **Unity 2D Top View Adventure Game**  
@@ -172,6 +176,7 @@ Resoruces 디렉터리에서 파일명에 해당하는 Texture2D를 가져와 �
 </details>
 
 ## WhatIsAVaccine
+### [개인] Unity 3D 추리 그림 그리기 서바이벌 게임
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
@@ -185,6 +190,9 @@ itch.io: [WhatIsAVaccine itch](https://jihunpark.itch.io/whatisavaccin)
 사설 게임잼에 참여하기 위해 개인적으로 연습했던 프로젝트들의 기능들을 합쳐봤습니다.  
 간단한 커스텀 쉐이더 제작하기, LLM API에게 프롬프트로 질문을 주고 답변 받기, 이미지를 인식시켜 그에 대한 해설을 받기,  
 그림판 기능 구현하기, 저장 기능, 캐릭터 이동, 카메라 이동 및 각도 조절 기능 구현, 시간 제한, 몬스터 전투 등을 전부 적용시켰습니다.
+
+### 제작 기간
+약 1개월 소요(연습 게임, 코드 개선 포함)
 
 ### 게임 소개
 **Unity 3D 추리 그림 그리기 서바이벌 게임**  
@@ -249,6 +257,7 @@ FixedUpdate 문으로 변경해 해결했습니다.
 </details>
 
 ## MonochromeInvader
+### [팀] Unity 2D 로그 & 소울 라이크 게임
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
@@ -257,9 +266,14 @@ FixedUpdate 문으로 변경해 해결했습니다.
 
 ### 프로젝트 개요
 대학교 게임 동아리 내에서 개발자 3인으로 팀을 꾸려 제작한 게임입니다.  
+학기 중에 시작해서 방학까지 이어졌습니다.  
 중간에 1명이 탈퇴했고, 스테이지1까지 개발 후 저까지 탈퇴해 개인 프로젝트로 넘겨줬습니다.
 
+### 제작 기간
+약 6개월 소요
+
 ### 게임 소개
+**Unity 2D 로그 & 소울 라이크 게임**  
 ![그림23](https://ji-hun-park.github.io/assets/images/pofol023.png "그림23"){: .align-center}
 
 흑백과 심플한 디자인을 컨셉으로 외계 침략자가 행성을 침략해 나가는 내용입니다.  
@@ -289,6 +303,7 @@ WASD, 방향키로 이동하며, 스페이스 바로 점프, 마우스 좌클릭
 </details>
 
 ## ScatteredTroops
+### [개인] Unity 2D TopView 전략 게임
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
@@ -297,9 +312,14 @@ Github: [Scattered-troops Git repository](https://github.com/ji-hun-park/Unity2D
 Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL6YTA2cz1Mr8_IMve9qQj_KtViny/view?usp=sharing)
 
 ### 프로젝트 개요
-개인적으로 산개 기능을 만들어보고 싶어 제작했습니다.
+스타크래프트에서 산개 기능이 없는 것에 의문을 느껴  
+산개 기능을 구현해보고 싶어 제작했습니다.
+
+### 제작 기간
+약 일주일 소요
 
 ### 게임 소개
+**Unity 2D TopView 전략 게임**  
 여러 유닛들을 선택해 이동시키거나 산개시킬 수 있습니다.  
 해당 기능을 활용해 전투를 유리하게 진행할 수 있습니다.
 
@@ -321,6 +341,7 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 </div>
 </details>
 ## MakeSomeStory
+### [개인] Unity 2D 이야기 생성 어플리케이션
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
@@ -331,7 +352,11 @@ Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_
 ### 프로젝트 개요
 대학교 전자상거래 강의의 과제 제출용으로 제작했습니다.
 
+### 제작 기간
+약 일주일 소요(캡스톤 프로젝트 일부를 복사해서 수정 작업 진행)
+
 ### 게임 소개
+**Unity 2D 이야기 생성 어플리케이션**  
 이미지와 컨셉을 입력해 이야기를 생성하는 앱입니다.
 
 ### 플레이 방식
@@ -359,7 +384,8 @@ LLM이 이야기를 자동으로 생성해 화면에 보여줍니다.
 ![그림22](https://ji-hun-park.github.io/assets/images/pofol022.png "그림22"){: .align-center}
 
 대학교 동아리 내에서 입문자를 위한 스터디에 참여해 3D 타워디팬스를 제작했습니다.  
-해당 스터디에서 끝까지 남아 제작을 완료한 사람은 제가 **유일**했습니다.  
+해당 스터디에서 끝까지 남아 제작을 완료한 사람은 제가 유일했습니다.  
+
 그 밖에 비행 기능, Marching Cubes 알고리즘 구현 등을 연습했습니다.
 </div>
 </details>
