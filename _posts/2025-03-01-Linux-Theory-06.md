@@ -218,8 +218,53 @@ int main(){
 뒤에 건 bss 부분이 크지만 실제로 데이터에 저장이 안 된다.  
 합쳐서 나오는 토탈 사이즈는 실제 사이즈가 아님.
 
+# 5.1 Review of the notation of a process
+## Process
+### Process (1/2)
+- 프로세스란 단순히 실행 중인(순간에) 프로그램의 인스턴스(instance)입니다.
+- 프로세스는 프로그램의 실행에 해당(대응)합니다.
+  - 프로그램은 컴파일되면 그 내용이 고정이지만, 프로세스는 그 변수의 내용이 매 순간 변한다.
+- 프로그램 ≠ 프로세스
+  - 프로그램은 그냥 컴파일한 실행 파일.
+  - 프로세스는 그 실행 파일이 메모리에 올라와서 실행되고 있는 인스턴스.
+  - 둘은 서로 다르다.
+- 프로세스 통합(incorporate), 가지고 있는 것
+  - 프로그램 코드(텍스트)
+  - 프로그램 변수 내의 데이터 값(initialized, bss, stack, heap)
+  - 하드웨어 레지스터(CPU)
+  - 프로그램 스택
+- 프로세스는 **프로세스 ID(pid)**로 식별(대응)됩니다.
+- 셸은 새 프로세스를 만듭니다.
+- 프로세스는 특정 시스템 콜(fork)에서 만들어줍니다.
+  - 프로세스에서 차일드(child, 자식) 프로세스를 만듭니다.
+
+```
+ $ cat file1 file2
+```
 ![그림04](https://ji-hun-park.github.io/assets/images/LNXIMG047.jpg "그림04"){: .align-center}
+이건(명령어) 문자열에 불가한 것이므로 셸이 해석해서 프로세스로 만들어 줍니다(fork() exec 시스템 콜 사용).  
+```
+ $ ls | wc -l
+```
 ![그림05](https://ji-hun-park.github.io/assets/images/LNXIMG048.jpg "그림05"){: .align-center}
+ls와 wc를 pipe해서 앞에 있는 프로세스의 출력을 뒤에 있는 프로세스의 입력으로 넣어줍니다.  
+각각의 프로세스에는 pid가 있습니다.(셸에도 있음)
+
+### Process (2/2)
+**Process environment(프로세스 실행환경)**  
+- 유닉스의 모든 프로세스는 어떤 다른 프로세스를 실행시킬 수 있다.
+- 이를 통해 UNIX 프로세스 환경은 파일 시스템의 디렉터리 트리와 평행한 계층 구조를 갖게 된다.
+  - 시스템 콜 실행 시 프로세스의 자식 프로세스가 만들어져 계층이 생긴다.
+  - 여러 개 만들 수 있으므로 계층 트리 구조(hierarchical structure)가 만들어진다, 마치 파일 시스템 구조처럼
+- 프로세스 트리의 맨 위 루트에 가장 중요한 단일 제어 프로세스(single controlling process)가 있다.
+  - 이는 궁극적으로 모든 시스템 및 사용자 프로세스의 조상인 `init`이라는 매우 중요한 프로그램의 실행이다.
+  - 아주 극도로 중요한 프로그램인 <span style="color:red">**init**</span> 시스템 콜(OS의 프로세스)
+  - 모든 프로세스의 부모 혹은 조상이 된다(아담)
+- UNIX는 프로세스 생성 및 조작을 위한 소수의 시스템 콜을 제공한다.(프로세스와 관련된 시스템 콜)
+  - fork, exec, wait, exit 등등
+
+# 5.2 Creation process
+
 ![그림06](https://ji-hun-park.github.io/assets/images/LNXIMG049.jpg "그림06"){: .align-center}
 ![그림07](https://ji-hun-park.github.io/assets/images/LNXIMG050.jpg "그림07"){: .align-center}
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG051.jpg "그림08"){: .align-center}
