@@ -543,8 +543,99 @@ argv[2]는 world에 대한 포인터
 (char *)0는 NULL
 
 # 5.4 Using *exec* and *fork* together
+## example
+```c
+/* runls3 -- 부프로세스에서 ls를 수행한다 */
+#include <unistd.h>
 
+int fatal(char *s){
+   perror(s);
+   exit(1);
+}
+
+main(){
+   pid_t pid;
+   switch (pid = fork()){
+   case -1:
+      fatal("fork failed");
+   case 0:
+      /*자식이 exec을 호출 */
+      execl("/bin/ls", "ls", "-l", (char*)0);
+      fatal("exec failed");
+      break;
+   default:
+      /* 부모가 자식이 끝날 때까지 수행을 일시 중단하기 위해 wait을 호출 */
+      wait((int*)0);
+      printf("ls completed\n");
+      exit(0);
+   }	
+}
+```
+메인 함수에 변수 pid가 있고,  
+fork해서 차일드(자식)를 만들고  
+리턴 값이 음수면 실패.
+
+차일드는 포크의 리턴 값이 0이니 case 0 부분을 실행  
+패런트는 디폴트 부분 실행
+
+execl(이그씨엘, 엘이니까 리스트로 나열하고, 패스네임을 준다, ls는 중복된다)
+
+이 때, 차일드는 `ls -l`을 실행하는 프로그램으로 변신한다.  
+실패하면(다시 돌아오니) 바로 밑에 있는 코드를 실행한다.(fatal)
+
+fatal은 괄호 안의 해당 문자를 받아서 출력해주고,  
+세팅된 에러 넘버의 설명문을 출력한 후 종료한다.
+
+패런트는 wait 시스템 콜을 실행(기다린다)한다.  
+자식이 끝날 때까지 기다리고 다음 코드를 실행한다.
 ![그림11](https://ji-hun-park.github.io/assets/images/LNXIMG054.jpg "그림11"){: .align-center}
+A가 parent(패런트, 부모), B가 child(차일드, 자식) 프로세스
+
+패런트가 포크 실행, 본인은 차일드의 pid를 리턴, 차일드는 pid 0을 리턴  
+pid가 0이면 `execl` 실행해서 `ls`를 실행하는 코드로 바뀌고 `ls -l`을 실행  
+패런트는 자식이 끌날 때까지 기다리다가, 자식이 종료되면 깨어난다.
+
+## The docommand example
+```c
+/* docommand --run shell command, first version */
+int docommand(char *command)
+{
+    pid_t pid;
+    if((pid = fork()) < 0 )
+    	return (-1);
+    
+    if(pid==0) /* child */
+    {
+    	execl("/bin/sh", "sh", "-c", command, (char *)0);
+    	perror("execl");
+    	exit(1);
+    }
+    
+    /* code for parent */
+    /* wait until child exits */
+    wait((int *)0);
+    return(0);
+}
+```
+- 셸 호출에 사용된 -c 인자는 표준 입력이 아닌 다음 문자열 인자에서 명령을 가져오도록 지시합니다.
+
+cmd를 실행하면 셸이 패런트가 된다.  
+포크해서 차일드를 만들면 차일드도 셸을 실행하지만,  
+커멘드를 실행하는걸 원한다.  
+
+위 코드는 자식 프로세스를 exec로 커멘드를 실행하는 프로그램으로 바꿔주는 과정이다.
+
+cmd가 문자열을 받았을 때 문자열이 커멘드로 들어오면  
+이걸 파싱해야 하는데 이게 복잡하다.(생략)
+
+포크를 실행하고 리턴 값이 음수면 포크에 실패했으니 -1을 리턴하고,  
+성공했다면 pid가 0이면 자식이니,  
+`execl`로 입력한 커멘드를 셸을 실행하여  
+`-c` 옵션으로 차일드를 하나 더 만들어 실행한다.  
+부모는 wait한 뒤 종료한다.
+
+# 5.5 Inherited data and file descriptors
+
 ![그림12](https://ji-hun-park.github.io/assets/images/LNXIMG055.jpg "그림12"){: .align-center}
 
 ## 작성중
