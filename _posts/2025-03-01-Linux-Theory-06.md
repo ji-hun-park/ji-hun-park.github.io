@@ -114,7 +114,8 @@ for (i = 0; environ[i]; i++)
   printf(“env[%d]: %s\n", i, environ[i]);
 ```
 ![그림02](https://ji-hun-park.github.io/assets/images/LNXIMG045.jpg "그림02"){: .align-center}
->특정 환경 변수에 접근하는 것은 일반적으로 **environ** 변수가 아닌 **getenv** 및 **putenv** 함수를 통해 이루어집니다.
+>특정 환경 변수에 접근하는 것은 일반적으로 **environ** 변수가 아닌  
+**getenv** 및 **putenv** 함수를 통해 이루어집니다.
 
 - 대부분의 UNIX 시스템은 main 함수에 세 번째 인자를 제공합니다.
 ```c
