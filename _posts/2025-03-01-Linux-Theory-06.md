@@ -635,10 +635,214 @@ cmd가 문자열을 받았을 때 문자열이 커멘드로 들어오면
 부모는 wait한 뒤 종료한다.
 
 # 5.5 Inherited data and file descriptors
+포크해서 만들어진 차일드는 패런트의 모든 속성이나 데이터를 상속 받는다.
 
+## fork, files and data
+**부모 프로세스에서 열려(open) 있는 모든 파일은 자식 프로세스에서도 열려(open) 있습니다.**  
 ![그림12](https://ji-hun-park.github.io/assets/images/LNXIMG055.jpg "그림12"){: .align-center}
+- 패런트가 오픈한 모든 파일 들은 차일드에서도 오픈됩니다.
+  - 오프셋 마저도 똑같습니다.
+  - 차일드가 출력하면 패런트 오프셋도 똑같습니다.
+- 부모와 자식이 **동일한 파일 오프셋을 공유**하는 것이 중요합니다.
+- 자식이 표준 출력에 쓸(writes) 때 부모의 오프셋이 자식에 의해 업데이트됩니다.
 
-## 작성중
+### example
+```c
+/* fork_filedes.c */
+/* fork는 "data"가 최소한 20문자 이상임을 가정한다 */
+
+main(){
+   int fd;
+   pid_t pid;
+   char buf[10];  /* 파일 자료를 저장할 버퍼 */
+   if((fd = open("data", O_RDONLY)) == -1)
+      fatal("open failed");
+   
+   read(fd, buf, 10);   /* 파일 포인터를 전진 */
+   printpos("Before fork", fd);
+   
+   switch(pid = fork()) {
+   case -1:    /* 오류 */
+      fatal("fork failed");
+      break;
+   case 0:     /* 자식 */
+      printpos("Child before read", fd);
+      read(fd, buf, 10);
+      printpos("Child after read", fd);
+      break;
+   default:    /* 부모 */
+      wait((int *)0);
+      printpos("Parent after wait", fd);
+   }
+}
+```
+포크로 만들어진 차일드는 패런트가 오픈한 파일을 그대로 오픈해서 공유한다.  
+패런트가 리드 라이트하면서 변화된 오프셋도 차일드가 그대로 가진다.  
+
+패런트와 차일드가 가리키는 파일 테이블이 동일하기 때문에,  
+패런트와 차일드는 파일 오프셋을 서로 공유하게 된다.  
+리드온리 모드로 data 파일을 오픈하고 패런트가 10바이트만큼 리드한다.
+
+프린트포스(printpos) 펑션  
+엘시크(lseek)를 사용해서 파일 디스크립터(서술자)에  
+POS = lseek(fd, 0, seekcir)를 리턴해준다(현재 파일 오프셋),  
+여기에선 10이 출력 된다.
+
+포크하면 pid에 차일드 pid가 들어가고, -1이면 페이탈 실행  
+pid가 0이면 자식, 디폴트는 부모
+
+차일드가 프린트포스 실행하면 패런트의 오프셋인 10이 찍힌다,  
+그리고 차일드가 리드 10을 하면,
+프린트 포스했을 때 20이 찍히고 종료된다.  
+부모가 기다렸다, 깨어나서 프린트포스를 실행하면 20이 출력된다.
+
+## Inherited properties from parent process
+**fork (2)**  
+**부모 프로세스에서 상속된 속성들**  
+- 실제(Real) 사용자(user) ID, 실제 그룹(group) ID
+- 유효(effective) 사용자 ID, 유효 그룹 ID
+- 보충(Supplementary) 그룹 ID
+- 프로세스(Process) 그룹 ID
+- 세션(Session) ID
+- 제어 터미널(Controlling terminal)
+- set-user-ID 및 set-group-ID 플래그(flags)
+- 현재 작업 디렉터리(Current working directory)
+- 루트 디렉터리(Root directory)
+- 파일 모드 생성 마스크(File mode creation mask)
+- 신호 마스크 및 처리(Signal mask and dispositions)
+- 열려 있는 모든 파일 서술자(FD)에 대한 close-on-exec 플래그
+- 환경(Environment)
+- 첨부된 공유 메모리 세그먼트(Attached shared memory segments)
+- 메모리 매핑(Memory mappings)
+- 리소스 제한(Resource limits)
+
+위는 포크로 자식이 부모로부터 상속받는 프라퍼티들(거의 대부분)이다.
+
+## The difference between the parent and child
+
+패런트 프로세스와 차일드 프로세스의 다른 값들은  
+포크하면서 리턴되는 pid 값(부모는 자식의 pid, 자식은 0),  
+각각의 프로세스 ID(pid) 값,  
+두 프로세스의 부모 프로세스 ID가 다르다.  
+자식의 부모 프로세스 ID는 fork를 실행한 프로세스의 pid가 되지만,  
+부모의 부모 프로세스 ID(ppid)는 변경되지 않는다.
+
+자식은 tms_utime, tms_stime, tms_cutime, tms_cstime 등이  
+값이 0으로 세팅된다(프로세스의 실행 시간을 측정하는 변수들),  
+파일록(File locks)도 상속 받지않고,  
+팬딩(pending)된 알람(alarm)도 클리어(clear) 된다.  
+팬딩 신호(pending signals)가 empty set으로 set된다.
+```
+clock_t tms_utime;  /* 포르세스의 사용자 시간 */
+clock_t tms_stime;  /* 프로세스의 커널 시간 */
+clock_t tms_cutime; /* 자식들의 사용자 시간 */
+clock_t tms_cstime; /* 자식들의 커널 시간 */
+```
+
+## exec(fork()) and open files
+원래의 프로그램에서 열린(opened) 파일은 `exec`를 통해  
+완전히 새로운 프로그램이 시작될 때 **열린 상태로 유지**됩니다.  
+이러한 파일에 대한 읽기-쓰기 포인터(파일 오프셋)는 **`exec` 호출에 의해 변경되지 않습니다.**  
+`close-on-exec` 플래그가 켜져 있으면(기본값은 꺼짐),  
+파일 조각(fragment)은 `close-on-exec` 플래그가 활성화되는(enabled) 방식을 보여줍니다.  
+```c
+/* close_on_exec.c */
+
+#inlucde <fcntl.h>
+.
+.
+int fd;
+fd = open(“file”, O_RDONLY);
+.
+.
+fcntl(fd, F_SETFD, 1);	/* close-on-exec 플래그를 on으로 설정 */
+
+fcntl(fd, F_SETFD, 0);	/* close-on-exec 플래그를 off로 설정 */
+
+res = fcntl(fd, F_GETFD, 0);	/* res==1:on, res==0:off */
+```
+포크하면 차일드는 패런트가 오픈한 fd를 그대로 상속받는다.  
+파일이 패런트와 차일드를 실행한 프로세스에서 오픈이 안 되어 있더라도 오픈된다.  
+파일 오프셋이 차일드가 exec해도 바뀌지 않고 그대로다.
+
+자식이 부모의 fd를 그대로 상속받는 것을 해결하기 위한 것이 close-on-exec 플래그다.
+
+클로즈 온 이그씨 플래그는 차일드가 exec을 실행하면 패런트가 오픈한 파일을 자동으로 exit한다.  
+기본값은 off로 설정되어 있어, 자동으로 close가 안 된다.  
+on하면 패런트가 오픈한 파일 디스크립터를 자동으로 close한다.  
+위는 이를 위해 플래그를 on해주는 예제다.
+
+파일컨트롤(fcntl)을 이용해 플래그를 on(1)할 수 있다, 0이면 off  
+포크하고 차일드가 exec하면 자동으로 부모의 fd는 close된다.
+
+### example
+```c
+/* close_off_exec.c */
+
+int main(int argc, char** argv)
+{
+  int fd;
+  pid_t pid;
+	
+  fd = open(“test”, O_RDONLY);
+	
+  pid = fork();
+  
+  if(pid == 0){
+    execl("exec","child",0);
+  }
+  if(pid < 0){
+    perror("MAIN PROCESS");
+  }
+	
+  wait(NULL);
+  printf("MAIN PROCESS EXIT\n");
+  close(fd);
+
+  return 0;
+}
+```
+```c
+/* exec.c */
+
+int main(int argc, char** argv)
+{
+  if( read(3, buff, 512) < 0){
+    perror("EXEC PROCESS");
+    exit(1);
+  }
+	
+  printf("EXEC PROCESS EXIT\n");
+	
+  return 0;
+}
+```
+`test` 파일을 오픈하고, 차일드를 만들고(fork),  
+차일드일 경우, execl을 실행해서 exec.c를 실행한다(아래 코드가 exec.c),  
+차일드가 실행하는동안 패런트는 기다리고,  
+자식은 argc가 1이다, argv에는 `child`만 있다.  
+부모의 fd가 3인데, 자식이 바로 fd 3을 리드하면,  
+부모가 오픈한 파일이 그대로 리드된다.(파일 오프셋이 바뀐다)
+
+## Inherited properties from the calling process
+**exec(2)**  
+**호출 프로세스에서 상속된 속성들**  
+- Real user ID and real group ID
+- Supplementary group IDs
+- Process group ID
+- Session ID
+- Controlling terminal
+- Time left until alarm clock
+- Current working directory
+- Root directory
+- File mode creation mask
+- File locks
+- Process signal mask
+- Pending signals
+- Resource limits
+- Values for tms_utime, tms_stime, tms_cutime, and tms_cstime
+
+자기 자신이 변신하더라도 상속 받는 것은 대동소이하다.
 
 ## 마무리
 이상으로 Linux 이론의 프로세스1편을 마치겠습니다.  
