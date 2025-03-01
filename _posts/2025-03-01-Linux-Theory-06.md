@@ -264,10 +264,114 @@ ls와 wc를 pipe해서 앞에 있는 프로세스의 출력을 뒤에 있는 프
   - fork, exec, wait, exit 등등
 
 # 5.2 Creation process
+## The getpid(2)and getppid(2)system call
+```c
+/* process_id.c */
+#include <unistd.h>
 
+pid_t getpid(void);
+//Returns: the process ID of the calling process
+
+pid_t getppid(void);
+//Returns: the parent process ID of the calling process
+```
+getpid와 getppid 시스템 콜은 unistd 헤더를 include 해야합니다.  
+getpid의 리턴 값은 시스템 콜을 호출한 프로세스의 프로세스 아이디  
+getppid의 리턴 값은 시스템 콜을 호출한 프로세스의 부모 프로세스 아이디
+
+모든 프로세스는 고유한(unique) 프로세스 ID(pid)와  
+음이 아닌 정수(non-negative integer)를 갖습니다.  
+프로세스 ID는 고유(유일)하지만 재사용 가능합니다.  
+(프로세스가 사라지면 다시 가져다 쓸 수 있음)
+
+## The fork(2) system call
+### The fork(2) system call (1/4)
+```c
+#include <unistd.h>
+
+pid_t fork(void);
+
+//Returns: 0 in child, process ID of child in parent, -1 on error
+```
+호출 프로세스의 추출된 복제본인 새 프로세스를 생성합니다.
+```c
+pid_t pid;
+…
+pid = fork();
+```
 ![그림06](https://ji-hun-park.github.io/assets/images/LNXIMG049.jpg "그림06"){: .align-center}
+차일드(자식) 프로세스를 만들어주는 시스템 콜  
+리턴 값이 0이면 만들어진 차일드 프로세스에서 실행되는 것이고,  
+0이 아니면 패런트(부모)에서 차일드 PID를 리턴하는 것이다.  
+에러일 때는 –1을 리턴한다.
+
+새로운 프로세스를 만들어 주는데 calling 프로세스와 아주 똑같은 프로세스를 만들어 준다.  
+(실행하는 코드도 똑같고, 변수들과 그 값이 똑같다, 다만 서로 **별개**의 프로세스다)
+
+### The fork(2) system call (2/4)
+- 자식은 부모의 데이터 공간(data space), 힙, 스택의 사본을 얻습니다.
+  - 부모 프로세스가 포크(fork)를 실행해 자식 프로세스를 만들면 자식 프로세스는 부모 프로세스의 복제본이다.
+  - 부모로부터 변수들의 데이터 공간, 힙, 스택 등을 복사한다.
+- 부모와 자식은 이러한 메모리 부분(공간들)을 공유하지 않습니다.
+- 부모와 자식은 텍스트 세그먼트(코드 부분)를 공유합니다.(Reentrant, 재진입성)
+- 오퍼레이팅 시스템은 시분할 시스템으로
+  - 자식을 만들면 프로세스가 늘어나서 순차적으로 실행하지만,
+  - 여기선 자식이 부모보다 먼저 실행을 시작하는지, 아니면 그 반대인지는 알 수 없습니다.
+  - 이는 커널에서 사용하는 스케줄링 알고리즘에 따라 달라집니다.
+
+### The fork(2) system call (3/4)
 ![그림07](https://ji-hun-park.github.io/assets/images/LNXIMG050.jpg "그림07"){: .align-center}
+프로세스A가 패런트(부모) B가 차일드(자식)  
+피지컬(물리적) 메모리에 **텍스트 부분**은 패런트와 차일드가 사용하는 부분이 **같다**.  
+그러나 **나머지**는 서로 **별개**의 공간을 사용한다.
+
+### The fork(2) system call (4/4)
+- pid의 값은 자식과 부모를 구분(distinguishes)합니다.
+  - 부모에서 pid: 0이 아닌 양의 정수(non-zero (positive)), 자식의 프로세스 ID
+  - 자식에서 pid: 0
+- 한계 오류(Limit error, **EAGAIN**)
+  - 프로세스 수에 대한 시스템 전체 한도
+  - 개별 사용자당 프로세스 수
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG051.jpg "그림08"){: .align-center}
+printf로 “One”을 출력한 뒤,  
+패런트가 포크(fork)를 실행하면 그 순간 차일드가 복제된다.  
+패런트와 차일드 모두 포크를 리턴하는 것부터 시작한다.  
+패런트와 차일드의 pid 값은 서로 다르다.  
+(차일드는 pid 리턴 값이 0, 부모는 양수)  
+차일드의 pid 값이 패런트 pid에 어사인(assign, 할당)된다.
+
+### example
+```c
+#include <unistd.h>
+
+main()
+{
+   pid_t pid;
+   printf (“Just one process so far\n”);
+   printf (“Calling fork …\n”);
+
+   pid = fork();
+
+   if (pid == 0)
+      printf(“I’m the child\n”);
+   else if (pid > 0)
+      printf(“I’m the parent, child has pid %d\n”, pid);
+   else
+      printf(“Fork returned error code, no child\n”);
+}
+```
+pid_t는 프리미티브 시스템 데이터 타입  
+printf 2번하고 fork한다.
+
+차일드는 리턴 값이 0이고, 패런트는 차일드의 pid 값을 리턴해준다.  
+if문으로 pid가 0인 경우를 체크하는데 차일드만 트루다.  
+패런트는 pid가 0보다 큰 경우일 때의 이프문을 실행한다.  
+이러한 차이점으로 패런트와 차일드가 하는 일을 구분 가능하다.  
+음수일 경우 에러다.
+
+# 5.3 Running new program with *exec*
+exec는 매우 중요한 시스템 콜로, 새로운 프로그램을 실행시킬 때 fork와 exec를 같이 씁니다.
+
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG052.jpg "그림09"){: .align-center}
 ![그림10](https://ji-hun-park.github.io/assets/images/LNXIMG053.jpg "그림10"){: .align-center}
 ![그림11](https://ji-hun-park.github.io/assets/images/LNXIMG054.jpg "그림11"){: .align-center}
