@@ -43,7 +43,7 @@ Abort(시스템 콜)를 사용해 종료하는 경우로,
 
 비정상적인 종료는 3가지 방법으로 발생합니다.  
 - abort 호출
-- 신호 수신
+- 신호(signal) 수신
 - 마지막 스레드가 취소 요청에 응답
 
 ## 작성중
@@ -60,6 +60,7 @@ Abort(시스템 콜)를 사용해 종료하는 경우로,
 #### MAXBUF
 ![그림11](https://ji-hun-park.github.io/assets/images/LNXIMG066.jpg "그림11"){: .align-center}
 ![그림12](https://ji-hun-park.github.io/assets/images/LNXIMG067.jpg "그림12"){: .align-center}
+[MAXBUF](https://ji-hun-park.github.io/linux/Linux-Theory-07/#maxbuf)
 ![그림13](https://ji-hun-park.github.io/assets/images/LNXIMG068.jpg "그림13"){: .align-center}
 ![그림14](https://ji-hun-park.github.io/assets/images/LNXIMG069.jpg "그림14"){: .align-center}
 ![그림15](https://ji-hun-park.github.io/assets/images/LNXIMG070.jpg "그림15"){: .align-center}
