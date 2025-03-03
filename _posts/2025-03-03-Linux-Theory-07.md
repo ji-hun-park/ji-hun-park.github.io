@@ -19,7 +19,32 @@ Process(프로세스)는 대부분 운영 체제 모델에서 기본적인 활�
 그런 다음 이번 장에서는 프로세스 생성,  
 프로세스 파괴 및 데몬 프로세스를 포함한 UNIX 프로세스 모델을 다룹니다.
 
-# 5.6 Terminating processes with the exit system call
+# 5.6 Terminating processes with the *exit* system call
+## Process Termination
+프로세스가 종료되는 방법은 8가지가 있습니다.  
+프로세스 종료는 크게 Normal 과 Abnormal termination으로 나뉩니다.
+
+normal termination은 main 프로그램에서 리턴해서  
+최종적으로 _exit()함수를 호출하고 종료합니다.
+
+Abnormal termination은 _exit()에 의해서 종료되지 않는 경우를 말합니다.  
+Abort(시스템 콜)를 사용해 종료하는 경우로,  
+코(메모리에 있는 모든 변수,스택,힙등) 덤프합니다.
+
+스레드와 관련이 있으며,  
+주로 시그널과 관련한 종료로 볼 수 있습니다.
+
+정상적인 종료는 5가지 방법으로 발생합니다.  
+- main에서 복귀
+- exit 호출
+- _exit 또는 _Exit 호출
+- 마지막 스레드가 시작 루틴에서 복귀
+- 마지막 스레드에서 pthread _exit 호출
+
+비정상적인 종료는 3가지 방법으로 발생합니다.  
+- abort 호출
+- 신호 수신
+- 마지막 스레드가 취소 요청에 응답
 
 ## 작성중
 ![그림01](https://ji-hun-park.github.io/assets/images/LNXIMG056.jpg "그림01"){: .align-center}
@@ -32,6 +57,7 @@ Process(프로세스)는 대부분 운영 체제 모델에서 기본적인 활�
 ![그림08](https://ji-hun-park.github.io/assets/images/LNXIMG063.jpg "그림08"){: .align-center}
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG064.jpg "그림09"){: .align-center}
 ![그림10](https://ji-hun-park.github.io/assets/images/LNXIMG065.jpg "그림10"){: .align-center}
+#### MAXBUF
 ![그림11](https://ji-hun-park.github.io/assets/images/LNXIMG066.jpg "그림11"){: .align-center}
 ![그림12](https://ji-hun-park.github.io/assets/images/LNXIMG067.jpg "그림12"){: .align-center}
 ![그림13](https://ji-hun-park.github.io/assets/images/LNXIMG068.jpg "그림13"){: .align-center}
