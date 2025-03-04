@@ -17,6 +17,25 @@ last_modified_at: 2025-03-04T24:00:00-00:00
 
 # 5.9 smallsh: a command processor
 ## Basic logic of command processor
+```
+while(EOF not typed)
+{
+
+	Get command line from user  <- userin()
+
+	Assemble command args and execute <- procline()
+
+         Wait for child
+
+}
+```
+셸의 처리과정은 다음과 같다.  
+1. 사용자 입력을 받는다.
+2. 명령을 실을 프로세스를 생성한다.(fork())
+3. 새로 생성된 자식 프로세스는 입력 받은 문자열을 exec호출에 적합한 형태로 구성한다.
+4. exec호출을 한다.
+
+이 4단계를 계속적으로 반복 하는 것이 셸이다.
 
 ## 작성중
 ![그림01](https://ji-hun-park.github.io/assets/images/LNXIMG064.jpg "그림01"){: .align-center}
