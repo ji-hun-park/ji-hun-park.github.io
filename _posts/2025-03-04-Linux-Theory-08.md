@@ -522,14 +522,118 @@ setsid()
 컨트롤링 터미널과 단절되어 표준입출력이 없다(daemon).
 
 ## The current working  & root directory
-### The current working  & root directory (1/2)
+현재 작업 경로를 변경할 수 있는 시스템 콜이 있다.  
+현재 뿌리 경로도 변경 가능하다.
 
+### The current working  & root directory (1/2)
+**The current working directory(현재 작업 디렉터리)**  
+- 현재 작업 디렉터리는 프로세스를 시작한 fork 또는 exec에서 상속(inherited)됩니다.
+- 프로세스별 속성(attribute)
+- 자식 프로세스가 chdir을 호출하여 위치를 변경하는 경우 부모 프로세스의 현재 작업 디렉터리는 변경되지 않습니다.
+
+**The current root directory(현재 루트 디렉터리)**  
+- 각 프로세스는 절대 경로명 검색에 사용되는 루트 디렉터리와도 연관됩니다.
+- 파일 시스템 계층(hierarchy)의 시작 위치.
 
 ### The current working  & root directory (2/2)
+```c
+#include <unistd.h>
+int chroot(const char *path);   
 
+    // Return: 0 if OK, -1 on error
+```
+커런트 루트 디렉터리 변경은 체인지루트(chroot)하고 패스네임을 준다.  
+이러면 /(루트)가 자신이 지정한 경로와 같아진다.  
+```c
+int main() {
+    int pid;
 
-## 작성중
+    if (chroot("/home/mydir") != 0){	/* ‘/’ == ‘/home/mydir’ */
+        perror("chroot");
+        exit(0);
+    }
+
+    if (execl("/bin/bash","bash", NULL) == -1) /* ‘/home/mydir/bin/bash’ */ 
+            perror("error");
+}
+```
+- chroot가 성공하면 path는 '/'로 시작하는 파일 검색의 시작점이 됩니다.
+- 프로세스 호출에만 해당하며, while은 영향을 받지 않습니다.
+
+## Changing User IDs and Group IDs
+```c
+#include <unistd.h>
+
+int setuid(uid_t uid);
+int setgid(gid_t gid);
+
+  // Both return: 0 if OK, -1 on error
+```
+`unistd` 헤더 인클루드하고,  
+`int setuid(uid_t uid);`  
+`int setgid(gid_t gid);`  
+리턴 값은 성공 시 0, 실패 시 -1이다.  
+유저아이디와 그룹아이디도 바꿀 수 있다.
+
 ![그림09](https://ji-hun-park.github.io/assets/images/LNXIMG072.jpg "그림09"){: .align-center}
+
+UNIX 시스템에서 현재 날짜에 대한 시스템의 개념을 변경할 수 있는 권한과  
+특정 파일을 읽거나 쓸 수 있는 권한과 같은 액세스 제어는  
+사용자 및 그룹 ID를 기반으로 한다.
+
+setuid 함수를 사용하여  
+실제(real) 사용자 ID와 유효(effective) 사용자 ID를 설정할 수 있다.  
+마찬가지로 setgid 함수를 사용하여  
+실제 그룹 ID와 유효 그룹 ID를 설정할 수 있다.
+
+## File size limits: ulimit
+```c
+#include <ulimit.h>
+long ulimit(int cmd, [long newlimit]);   
+
+	// Return: the value of the requested limit if OK, -1 on error
+```
+- write 시스템 콜로 생성할 수 있는 파일 크기에는 프로세스당 제한이 있습니다.
+- 현재 파일 크기 제한을 얻으려면
+  - 매개변수 `cmd`를 **UL_GETFSIZE**로 설정합니다.
+- 파일 크기 제한을 변경하려면
+  - 매개변수 `cmd`를 **UL_SETFSIZE**로 설정합니다.
+  - newlimit와 함께
+- 실제로 **슈퍼유저만** 이런 방식으로 파일 크기 제한을 늘릴 수 있습니다.
+- 그러나 다른 사용자의 유효 사용자 ID가 제한을 줄일 수 있는 프로세스입니다.
+
+## Process priorities: nice
+nice란 OS와 관련된 것이다.  
+프로세스에는 priority(프라이어티, 우선도)라는 것이 있다.
+
+시스템은 특정 프로세스에 할당되는 CPU 시간의 비율을  
+부분적으로 정수 nice 값에 따라 결정한다.
+
+Nice value range(값 범위)가 있는데,  
+0부터 시스템 존속 최댓값(보통 8)까지 있다.
+
+숫자가 높을수록 프라이어티(우선도)가 낮다,  
+0이 가장 높은 프라이어티다.
+
+슈퍼유저(Superuser) 프로세스는 nice 호출 매개변수로  
+음수 값을 사용하여 우선순위를 높일 수 있다.
+
+프라이어티가 낮으면 우선 순위가 낮기에,  
+CPU 점유율이 낮아서 실행 속도가 낮다.  
+아주 **중요한 OS**같은 프로세스는 **프라이어티가 높다.**
+
+큰 프로그램을 백그라운드에서 돌리고 포그라운드에서 exit해 버리면,  
+저 큰 프로그램이 실행되는 도중에 죽는다.  
+(그렇다고 포그라운드에서 돌리면 약 1시간(실행 시간)동안 셸이 안 뜬다.)
+
+리눅스는 멀티 유저가 사용하기에 오래 기다리면 불만이 발생한다.  
+```
+ $nohup nice cc big.c 2>err &
+ // 2>err은 컴파일해서 에러가 나면 err 파일에다 출력하라.
+ $exit
+```
+나이스로 프라이어티를 낮춰준다.  
+노헙은 **SIGHUP** 시그널을 차단해준다.
 
 ## 마무리
 이상으로 Linux 이론의 프로세스 & 셸편을 마치겠습니다.  
