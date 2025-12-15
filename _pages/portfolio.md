@@ -94,7 +94,7 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 아이템의 경우 ScriptableObject로 구현했습니다.
 
 ### 난관들
-깃 협업 과정에서 충돌이 나는 문제, 프리팹 미적용, 기능 충돌 등의 문제가 있었습니다.  
+깃 협업 과정에서 Git 충돌이 나는 문제, 한글이 깨지는 문제, 프리팹 미적용, 코드 기능 상충 등의 문제가 있었습니다.  
 
 **충돌로 인해 깨진 씬**  
 ![그림16](https://ji-hun-park.github.io/assets/images/pofol016.png "그림16"){: .align-center}
