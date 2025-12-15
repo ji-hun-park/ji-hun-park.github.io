@@ -39,11 +39,15 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 몬스터들에게 납치당한 여주인공(Granada)이 흘린 소지품들의 흔적을 찾아 보스를 무찌르고 여주인공을 구출하는 게임입니다.  
 
 **게임 흐름도**  
+![흐름도_그라나다](https://ji-hun-park.github.io/assets/images/Flowchart_Forthegranada.png "flowchart_granada"){: .align-center}
+
+<!--
 ![그림35](https://ji-hun-park.github.io/assets/images/pofol035.png "그림35"){: .align-center}
 
 **보스 패턴 흐름도**  
 ![그림36](https://ji-hun-park.github.io/assets/images/pofol036.png "그림36"){: .align-center}
 ![그림37](https://ji-hun-park.github.io/assets/images/pofol037.png "그림37"){: .align-center}
+-->
 
 ### 플레이 방식
 <details>
@@ -108,7 +112,7 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 무료 플랫폼의 경우 계정 당 하루 6종류 제한이라 다른 팀원들의 도움을 적극적으로 요청했습니다.  
 최대한 필요할 것 같은 기능들을 전달하고, 이를 적극적으로 만들었고, 가장 많은 커밋을 했습니다.  
 게임 플레이를 직접하면서 경험을 전달하고 수치를 협의 후 조절하는 등으로 적극적으로 임하였습니다.  
-일부 코드의 경우 AI의 도움을 받았습니다.
+일부 몰랐던 기능들을 LLM과 구글링을 통해 해결하였습니다.
 
 <!--
 **커밋들**  
