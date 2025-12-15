@@ -14,10 +14,13 @@ toc_label: "목차"
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
-### Links
-Download: [ForTheGranada GoogleDrive](https://drive.google.com/drive/folders/1O5f4WLxdKuyVzdOm2uxCYTrPCpUg5eTf?usp=sharing)  
-Game Introduction Video: [ForTheGranada Youtube](https://www.youtube.com/watch?v=3aYrso13pHI)  
-Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)  
+
+**"Google Gemini API를 활용하여 매번 새로운 퀴즈를 생성하는 시스템을 구축했습니다."**
+
+## Links
+📥**Download:** [ForTheGranada GoogleDrive](https://drive.google.com/drive/folders/1O5f4WLxdKuyVzdOm2uxCYTrPCpUg5eTf?usp=sharing)  
+🎬**Game Introduction Video:** [ForTheGranada Youtube](https://www.youtube.com/watch?v=3aYrso13pHI)  
+💻**Github:** [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)  
 >원본 팀 프로젝트는 Private이며, 리팩토링 코드는 본 링크에서 확인 가능합니다.  
 
 ## Documents
@@ -25,15 +28,33 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 상세설계서: [상세설계서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%83%81%EC%84%B8%EC%84%A4%EA%B3%84%EC%84%9C_002_GameinhAi.pdf)  
 최종보고서: [최종보고서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%B5%9C%EC%A2%85%EB%B3%B4%EA%B3%A0%EC%84%9C_GameinhAi.docx)
 
-### 프로젝트 개요
-대학교 종합설계(캡스톤)에서 졸업과제로 제작한 개발자 3인으로 구성된 팀프로젝트 게임입니다.
+## 프로젝트 개요
+**생성형 AI(Gemini API)를 활용한 실시간 퀴즈 생성 시스템이 도입된 2D 탑뷰 어드벤처 게임**으로  
+대학교 종합설계(캡스톤)에서 졸업과제로 제작한 개발자 3인으로 구성된 팀프로젝트입니다.
+
+### 장르
+2D Top-View Adventure
+
+### 개발 인원
+개발자 3인(팀원, 클라이언트 개발 등, 개인 기여도 40% 이상)
 
 ### 제작 기간
 2024.8 ~ 2024.12 사전 기획 포함 약 4개월 소요  
-2025.1 ~ 2025.2 개인 리팩토링 기간
+2025.1 ~ 2025.2 개인 리팩토링 1개월
 
-### 게임 소개
+### 개발 환경
+Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
+
+### 핵심 역할
+* Google Gemini API 연동 및 비동기 통신 구현
+* FSM 기반 보스 AI 및 패턴 설계
+* 전체 게임 매니지먼트 및 데이터 구조 설계
+
+## 게임 소개
 **Unity 2D Top View Adventure Game**  
+
+**Core Loop:** 탐험(몬스터 회피) -> 열쇠 조각 수집(퀴즈) -> 보스전 -> 엔딩
+
 ![그림07](https://ji-hun-park.github.io/assets/images/pofol007.png "그림07"){: .align-center}
 
 몬스터들에게 납치당한 여주인공(Granada)이 흘린 소지품들의 흔적을 찾아 보스를 무찌르고 여주인공을 구출하는 게임입니다.  
@@ -61,7 +82,7 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 
 * 메인 화면에서 게임시작 버튼을 누르면 난이도 선택 창이 나타나며, 쉬움, 보통, 도전 중 하나를 선택하면 스테이지에 진입합니다.  
 * WASD를 통한 4방향 이동 방식으로 각 스테이지마다 전체 맵의 구조가 랜덤으로 바뀌며, 각 맵마다 보물 상자가 존재합니다.  
-* 공격 기능이 없어 몬스터의 공격을 피해야 합니다.  
+* 공격 기능이 없어 몬스터의 공격을 회피해야 합니다.  
 * 몬스터는 부채꼴 모양의 시야각으로 플레이어를 인식하며, 장애물 뒤에 숨으면 인식을 못 합니다.  
 * 플레이어의 체력이 0이 되거나 제한 시간을 초과하면 게임 오버입니다.
 
@@ -90,14 +111,14 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 </details>
 
 ### Assets Used
-2D 픽셀 아트 에셋, 음향 에셋, UI 에셋, 생성형 AI 이미지 등을 사용했습니다.  
-아이템의 경우 ScriptableObject로 구현했습니다.
+2D 픽셀 아트 캐릭터 및 장식물 에셋, 음향 에셋, UI 에셋, 생성형 AI 이미지 등을 사용했습니다.  
+아이템의 경우 관리의 유용성을 위해 ScriptableObject로 구현했습니다.
 
 게임의 일관성과 비용 절감을 위해 유료 이미지가 아닌 생성형 AI 이미지를 활용하였고,  
 통신 과정에서 발생하는 지연 시간과 이미지 파일들의 사이즈를 고려하여  
 클라우드가 아닌 파일 시스템을 사용하였습니다.
 
-### 난관들
+### 협업 난관들
 깃 협업 과정에서 Git 충돌이 나는 문제, 한글이 깨지는 문제,  
 프리팹 미적용, 코드 기능 상충, 미지의 기술 등의 문제가 있었습니다.  
 
@@ -113,12 +134,7 @@ Github: [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)
 각자 따로 백업하고 자주 Git push와 pull을 하고 PR을 날리는 등의 조치를 취했습니다.
 
 ## 개인 활약
-적극적으로 게임 요소에 관한 추가 의견이나, 게임 플레이와 관련된 의견을 냈고,  
-특히 미니게임의 경우 생성형 AI를 통한 이미지가 100종류 필요한데,  
-무료 플랫폼의 경우 계정 당 하루 6종류 제한이라 다른 팀원들의 도움을 적극적으로 요청했습니다.  
-최대한 필요할 것 같은 기능들을 전달하고, 이를 적극적으로 만들었고, 가장 많은 커밋을 했습니다.  
-게임 플레이를 직접하면서 경험을 전달하고 수치를 협의 후 조절하는 등으로 적극적으로 임하였습니다.  
-
+### 핵심
 일부 몰랐던 기능이 존재했고, 이를 LLM과 구글링을 통해 해결하였습니다.  
 특히 Unity에서 LLM API를 활용하는 기술은 최신 기술이기에 낯설었지만,  
 ChatGPT를 통해 기본 틀을 알아낸 후 이상한 부분, 대표적으로 API키 부분과  
@@ -126,11 +142,19 @@ URL, JSON이 이상했는데 이를 검색을 통해 수정했습니다.
 또한 패키지가 필요한 점을 깨닫고 검색을 통해 패키지를 추가하기도 했습니다.  
 이후 여러 시행 착오를 통해 기능을 구현하는데 성공했습니다.
 
+### 기타 협업 경험
+적극적으로 게임 요소에 관한 추가 의견이나, 게임 플레이와 관련된 의견을 냈고,  
+특히 미니게임의 경우 생성형 AI를 통한 이미지가 100종류 필요한데,  
+무료 플랫폼의 경우 계정 당 하루 6종류 제한이라 다른 팀원들의 도움을 적극적으로 요청했습니다.  
+최대한 필요할 것 같은 기능들을 전달하고, 이를 적극적으로 만들었고, 가장 많은 커밋을 했습니다.  
+게임 플레이를 직접하면서 경험을 전달하고 수치를 협의 후 조절하는 등으로 적극적으로 임하였습니다.  
+
 <!--
 **커밋들**  
 ![그림38](https://ji-hun-park.github.io/assets/images/pofol038.png "그림38"){: .align-center}
 ![그림39](https://ji-hun-park.github.io/assets/images/pofol039.png "그림39"){: .align-center}
 -->
+
 ### 주요 담당 역할 (Contribution)
 팀원 중 가장 많은 종류의 역할(40% 이상의 기여도)을 수행했습니다.  
 - Core Systems: 게임 매니저, 게임 클리어 오버 시스템, 카메라 이동 제어, 씬 전환, 데이터 관리 시스템 구축
@@ -139,6 +163,10 @@ URL, JSON이 이상했는데 이를 검색을 통해 수정했습니다.
 - Optimization: 재귀적 탐색을 통한 UI 관리 최적화, 상자 아이템 배치 최적화, 모듈화를 통한 결합도 감소 (리팩토링)
 
 그 중 가장 **핵심**이 된 LLM API를 활용한 미니게임 퀴즈 구현에 대해 자세히 설명드리겠습니다.
+
+**Gemini API 핵심**  
+- JSON 파싱(Newtonsoft.Json) 및 비동기 통신(UnityWebRequest) 구현
+- Texture2D -> JPG -> Base64 변환 최적화로 이미지 전송 지연 최소화
 
 각 맵 중앙 혹은 구석에 하나만 위치하는 보물 상자에 가까이 다가가 상호 작용 버튼(기본 설정은 F)을 누르면,  
 미니게임 전용 UI가 나타나며 화면에는 3개의 이미지와 3개의 보기 선택 버튼이 유니크한 랜덤으로 주어지고, LLM API(Gemini)가 유추한 1개의 보기가 랜덤한 버튼 위치에 포함됩니다.(API의 응답이 보기와 겹칠 경우 나머지 보기를 다시 뽑습니다)
