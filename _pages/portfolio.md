@@ -166,9 +166,11 @@ URL, JSON이 이상했는데 이를 검색을 통해 수정했습니다.
 
 그 중 가장 **핵심**이 된 LLM API를 활용한 미니게임 퀴즈 구현에 대해 자세히 설명드리겠습니다.
 
-**Gemini API 핵심**  
+**Gemini API**  
 - JSON 파싱(Newtonsoft.Json) 및 비동기 통신(UnityWebRequest) 구현
-- Texture2D -> JPG -> Base64 변환 최적화로 이미지 전송 지연 최소화
+- Texture2D -> JPG(PNG라면 압축해제) -> Base64 변환 최적화로 이미지 전송 지연 최소화
+
+![그림39](https://ji-hun-park.github.io/assets/images/AIAPICHART.png "그림39"){: .align-center}
 
 각 맵 중앙 혹은 구석에 하나만 위치하는 보물 상자에 가까이 다가가 상호 작용 버튼(기본 설정은 F)을 누르면,  
 미니게임 전용 UI가 나타나며 화면에는 3개의 이미지와 3개의 보기 선택 버튼이 유니크한 랜덤으로 주어지고, LLM API(Gemini)가 유추한 1개의 보기가 랜덤한 버튼 위치에 포함됩니다.(API의 응답이 보기와 겹칠 경우 나머지 보기를 다시 뽑습니다)
