@@ -1,5 +1,5 @@
 ---
-title: "forthegranada"
+title: "FortheGranada"
 permalink: /forthegranada/
 layout: single
 toc: true
