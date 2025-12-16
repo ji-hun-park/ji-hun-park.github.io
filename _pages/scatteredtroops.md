@@ -1,6 +1,6 @@
 ﻿---
-title: "ScatterdTroops"
-permalink: /scatterdtroops/
+title: "ScatteredTroops"
+permalink: /scatteredtroops/
 layout: single
 toc: true
 toc_sticky: true
