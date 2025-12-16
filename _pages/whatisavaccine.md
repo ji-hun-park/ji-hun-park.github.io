@@ -9,6 +9,8 @@ toc_label: "목차"
 
 **"Generative AI와 게임 플레이의 결합 그리고 게임 속 그림판"**
 
+![움그00](https://ji-hun-park.github.io/assets/images/canvas.gif "움그00"){: .align-center}
+
 ## 0. Links
 📥**Download:** [WhatIsAVaccine GoogleDrive](https://drive.google.com/file/d/1UxYPVTVv3ubTJkSkJFCheksu-1MviBIz/view?usp=sharing)  
 🎬**Play Video:** [WhatIsAVaccine Play Video](https://youtu.be/HhLgUsnNSzc)  
@@ -126,7 +128,7 @@ toc_label: "목차"
 
 ![EventDriven](https://ji-hun-park.github.io/assets/images/pofol033.png "EventDriven"){: .align-center}
 
-* **기존:** `Update` 문에서 매 프레임 상태를 체크하는 폴링(Polling) 방식 사용. (불필요한 연산 낭비)
+* **기존:** `Update` 문에서 매 프레임 상태를 체크하는 폴링(Polling) 방식 사용. (불필요한 연산 낭비 발생)
 * **개선:** C# `Action` 및 Unity `UnityEvent`를 활용한 **옵저버 패턴(Observer Pattern)** 적용.
     * 객체 간의 결합도(Coupling)를 낮추고 유지보수성을 향상시켰습니다.
 
