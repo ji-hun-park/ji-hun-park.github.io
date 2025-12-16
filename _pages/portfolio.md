@@ -11,9 +11,13 @@ toc_label: "목차"
 
 ## ForTheGranada
 ### [팀프로젝트/싱글플레이] Unity 2D Top View Adventure Game
+[FortheGranada](https://ji-hun-park.github.io/forthegranada)
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
 
 **"Google Gemini API를 활용하여 매번 새로운 퀴즈를 생성하는 시스템을 구축했습니다."**
 
@@ -73,9 +77,12 @@ Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
 -->
 
 ### 플레이 방식
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
 
 ![그림08](https://ji-hun-park.github.io/assets/images/pofol008.png "그림08"){: .align-center}
 ![그림13](https://ji-hun-park.github.io/assets/images/pofol013.png "그림13"){: .align-center}
@@ -109,8 +116,11 @@ Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
 ![그림40](https://ji-hun-park.github.io/assets/images/pofol040.jpg "그림40"){: .align-center}
 
 보스의 HP가 0이 되면 엔딩 컷씬이 나오면서 게임 클리어입니다.  
+
+<!--
 </div>
 </details>
+-->
 
 ### Assets Used
 2D 픽셀 아트 캐릭터 및 장식물 에셋, 음향 에셋, UI 에셋, 생성형 AI 이미지 등을 사용했습니다.  
@@ -245,14 +255,21 @@ Before: 모든 기능이 게임 매니저 안에 들어가서 게임 매니저�
 After: 각 기능 별로 별도의 매니저로 나누어 함수들을 분리했습니다.
 
 그 밖에도 중복되는 부분을 하나의 함수로 묶거나, 변수를 읽기 전용으로 제한하거나 상수로 바꾸거나, Update 문의 호출을 event등을 이용해 줄이는 시도를 했습니다.
+
+<!--
 </div>
 </details>
+-->
 
 ## WhatIsAVaccine
 ### [개인프로젝트/싱글플레이] Unity 3D 추리 그림 그리기 서바이벌 게임
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ### Links
 Download: [WhatIsAVaccine GoogleDrive](https://drive.google.com/file/d/1UxYPVTVv3ubTJkSkJFCheksu-1MviBIz/view?usp=sharing)  
 Play Video: [WhatIsAVaccine Play Video](https://youtu.be/HhLgUsnNSzc)  
@@ -275,9 +292,12 @@ Github: [WhatIsAVaccine Github](https://github.com/ji-hun-park/Weru_GameJam_R1)
 독이 퍼지기 전에 해당 공간의 AI를 통해 키워드를 알아내 스캐너에게 그림을 전송해 해독제를 얻어야 한다.
 
 ### 플레이 방식
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
 
 ![그림03](https://ji-hun-park.github.io/assets/images/pofol003.png "그림03"){: .align-center}
 ![그림04](https://ji-hun-park.github.io/assets/images/pofol004.png "그림04"){: .align-center}
@@ -293,8 +313,11 @@ Github: [WhatIsAVaccine Github](https://github.com/ji-hun-park/Weru_GameJam_R1)
 * 맵 중앙 스크린에 상호 작용한 후 캔버스에 키워드를 연상시키는 그림을 그려 저장 후 전송
 * 스캐너에게 말을 걸면 그림을 보고 해석한 답변을 내놓고, 키워드와 일치하는 부분은 빨간색으로 표시
 * 키워드가 포함되면 클리어, 없으면 게임 오버
+
+<!--
 </div>
 </details>
+-->
 
 ### 사용 에셋
 무료 3D 에셋을 사용했습니다.
@@ -327,8 +350,11 @@ C#과 유니티의 event를 통해 Update문 호출을 줄였습니다.
 ### 코드 개선
 빌드 후 적이 너무 빨리 이동하는 현상이 있었는데, 일반 Update 문에서 이동한 것이 문제였기에  
 FixedUpdate 문으로 변경해 해결했습니다.
+
+<!--
 </div>
 </details>
+-->
 
 ## MonochromeInvader
 ### [팀프로젝트/싱글플레이] Unity 2D 로그 & 소울 라이크 게임
@@ -357,9 +383,13 @@ FixedUpdate 문으로 변경해 해결했습니다.
 여러 기믹들이 존재하며, 다회차 플레이를 통해 최고점을 갱신할 수 있습니다.
 
 ### 플레이 방식
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 WASD, 방향키로 이동하며, 스페이스 바로 점프, 마우스 좌클릭으로 공격이 가능합니다.  
 마우스를 길게 눌러 차징 공격이 가능합니다.  
 공격에는 코스트가 소모되며, 피격 시에도 코스트가 소모돼, 0이 되면 게임 오버입니다.  
@@ -378,14 +408,21 @@ WASD, 방향키로 이동하며, 스페이스 바로 점프, 마우스 좌클릭
 Git으로 협업하면서 meta 파일을 공유하지않아 발생하는 씬 수정 내용 누락 이슈를 알게되었고,  
 하나의 게임 제작 과정 전체를 보면서 게임 제작의 전반적인 흐름을 이해할 수 있게되었습니다.  
 또한 오브젝트 풀링의 필요성과 구현 과정을 이해하게 되었습니다.
+
+<!--
 </div>
 </details>
+-->
 
 ## ScatteredTroops
 ### [개인프로젝트/싱글플레이] Unity 2D TopView 전략 게임
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ### Links
 Github: [Scattered-troops Git repository](https://github.com/ji-hun-park/Unity2D-Scattered-troops)  
 Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL6YTA2cz1Mr8_IMve9qQj_KtViny/view?usp=sharing)
@@ -403,9 +440,13 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 해당 기능을 활용해 전투를 유리하게 진행할 수 있습니다.
 
 ### 플레이 방식
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ![그림00](https://ji-hun-park.github.io/assets/images/pofol000.png "그림00"){: .align-center}
 ![그림01](https://ji-hun-park.github.io/assets/images/pofol001.png "그림01"){: .align-center}
 ![그림02](https://ji-hun-park.github.io/assets/images/pofol002.png "그림02"){: .align-center}
@@ -415,15 +456,23 @@ Download: [Scattered-troops Google Drive](https://drive.google.com/file/d/1mgscL
 * 선택된 유닛들은 우클릭으로 이동시킬 수 있습니다.
 * 선택된 유닛들은 S를 통해 좁게, D를 통해 넓게 산개시킬 수 있습니다.
 * A를 누른 후 적을 누르면 적을 중심으로 원형으로 산개합니다. 다시 A를 눌러 취소할 수 있습니다.
+
+<!--
 </div>
 </details>
 </div>
 </details>
+-->
+
 ## MakeSomeStory
 ### [개인프로젝트/싱글플레이] Unity 2D 이야기 생성 어플리케이션
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ### Links
 Github: [MakeSomeStory Git repository](https://github.com/ji-hun-park/ECommerce_Exam)  
 Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_WlWCnVanbBfses3WpokIHQHxeMNRtRy?usp=sharing)
@@ -439,9 +488,13 @@ Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_
 이미지와 컨셉을 입력해 이야기를 생성하는 앱입니다.
 
 ### 플레이 방식
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ![그림17](https://ji-hun-park.github.io/assets/images/pofol017.png "그림17"){: .align-center}
 ![그림18](https://ji-hun-park.github.io/assets/images/pofol018.png "그림18"){: .align-center}
 ![그림19](https://ji-hun-park.github.io/assets/images/pofol019.png "그림19"){: .align-center}
@@ -452,14 +505,22 @@ Download: [MakeSomeStory Google Drive](https://drive.google.com/drive/folders/1_
 거기에 맞는 컨셉을 직접 입력 후 전송하면  
 LLM이 이야기를 자동으로 생성해 화면에 보여줍니다.  
 메뉴에서 생성된 이야기들을 볼 수 있습니다.
+
+<!--
 </div>
 </details>
 </div>
 </details>
+-->
+
 ## etc.
+
+<!--
 <details>
 <summary>클릭해서 펼치기 / 접기</summary>
 <div markdown="1">
+-->
+
 ![그림22](https://ji-hun-park.github.io/assets/images/pofol022.png "그림22"){: .align-center}
 
 대학교 동아리 내에서 입문자를 위한 스터디에 참여해 3D 타워디팬스를 제작했습니다.  
@@ -469,5 +530,8 @@ LLM이 이야기를 자동으로 생성해 화면에 보여줍니다.
 모바일 퍼즐 게임 등을 제작해봤습니다.
 
 그 밖에 비행 기능, Marching Cubes 알고리즘 구현 등을 연습했습니다.
+
+<!--
 </div>
 </details>
+-->
