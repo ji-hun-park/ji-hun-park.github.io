@@ -14,12 +14,18 @@ toc_label: "목차"
 ~~itch.io: [WhatIsAVaccine itch](https://jihunpark.itch.io/whatisavaccin)~~
 
 ## 프로젝트 개요
+**흐름도**  
 ![그림00](https://ji-hun-park.github.io/assets/images/Game_Loop_with_API.png "그림00"){: .align-center}
 
-사설 게임잼에 참여하기 위해 개인적으로 연습했던 프로젝트들의 기능들을 합쳐봤습니다.  
-간단한 커스텀 쉐이더 제작하기, LLM API에게 프롬프트로 질문을 주고 답변 받기,  
+사설 게임잼에 참여하기 위해  
+기존에 개인적으로 연습했던 프로젝트 들의 기능들을 통합해봤습니다.
+
+간단한 커스텀 쉐이더 제작하기,  
+LLM API에게 프롬프트로 질문을 주고 답변 받기,  
 이미지를 인식시켜 그에 대한 해설을 받기,  
-그림판 기능 구현하기, 저장 기능, 캐릭터 이동, 카메라 이동 및 각도 조절 기능 구현,  
+그림판 기능 구현하기,  
+저장 기능, 캐릭터 이동,  
+카메라 이동 및 각도 조절 기능 구현,  
 시간 제한, 몬스터 전투 등을 전부 적용시켰습니다.
 
 ## 제작 기간
@@ -69,6 +75,7 @@ toc_label: "목차"
 - 점프와 대쉬 기능과 그를 위한 마나 구현
 - 카메라 이동 및 제어 기능
 - 시간 제한 기능
+- 캐릭터 접근 시 메테리얼 변경 기능
 - 몬스터가 플레이어를 인식해 이동, 투사체 발사 등 전투 기능
 - LLM API에게 질문과 키워드를 전송해 힌트를 답변으로 받는 기능
 - 힌트들을 볼 수 있는 스크롤 UI 구현
@@ -85,22 +92,24 @@ toc_label: "목차"
 - 저장 기능을 통해 UNDO REDO 구현
 - LLM API를 통해 이미지 전송 및 해석 기능 구현
 
-![그림33](https://ji-hun-park.github.io/assets/images/pofol033.png "그림33"){: .align-center}
-
-일치하는 부분이 있었으면 클리어 플래그를, 없었으면 페일 플래그를 세웁니다.  
-C#과 유니티의 event를 통해 Update문 호출을 줄였습니다.
-
-![그림34](https://ji-hun-park.github.io/assets/images/pofol034.png "그림34"){: .align-center}
-
-
 ## 난관
 캐릭터가 벽을 통과하는 버그가 있어 프로젝트 설정을 변경해 해결했습니다.  
 맵이 너무 커서 렌더링이 안되는 부분이 있어 카메라의 far을 조절하고,  
 벽 사이 간격을 좁혔습니다.
 
 ## 코드 개선
+**플래그 사용**  
+![그림33](https://ji-hun-park.github.io/assets/images/pofol033.png "그림33"){: .align-center}
+
+일치하는 부분이 있었으면 클리어 플래그를, 없었으면 페일 플래그를 세웁니다.  
+C#과 유니티의 event를 각각 사용해보며 불필요한 Update문 호출을 줄였습니다.
+
+**어드레서블 사용**
+![그림34](https://ji-hun-park.github.io/assets/images/pofol034.png "그림34"){: .align-center}
+
 이미지 접근 최적화를 위해  
 Addressable을 이용하는 시도를 했습니다.
+
 
 빌드 후 적이 너무 빨리 이동하는 현상이 있었는데, 일반 Update 문에서 이동한 것이 문제였기에  
 FixedUpdate 문으로 변경해 해결했습니다.
