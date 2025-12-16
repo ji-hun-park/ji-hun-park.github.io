@@ -7,7 +7,7 @@ toc_sticky: true
 toc_label: "목차"
 ---
 
-**"Google Gemini API를 활용하여 매번 새로운 퀴즈를 생성하는 시스템을 구축했습니다."**
+**"Generative AI API를 활용하여 매번 새로운 퀴즈를 생성하는 시스템을 구축했습니다."**
 
 ![움그00](https://ji-hun-park.github.io/assets/images/ftgplay.gif "움그00"){: .align-center}
 
