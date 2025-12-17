@@ -29,5 +29,8 @@ toc_label: "목차"
 ### [PC/개인프로젝트/싱글플레이] Unity 2D 이야기 생성 어플리케이션
 📥**[MakeSomeStory](https://ji-hun-park.github.io/makesomestory)**
 
+### [모바일/개인프로젝트/싱글플레이] Unity 2D 퍼즐 게임
+📥**[ThingPuzzle](https://ji-hun-park.github.io/thingpuzzle)**
+
 ## etc.
 📥**[기타](https://ji-hun-park.github.io/etc)**

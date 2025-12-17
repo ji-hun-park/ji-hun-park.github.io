@@ -46,7 +46,9 @@ toc_label: "목차"
 
 ![그림07](https://ji-hun-park.github.io/assets/images/pofol007.png "그림07"){: .align-center}
 
-몬스터들에게 납치당한 여주인공(Granada)이 흘린 소지품들의 흔적을 찾아 보스를 무찌르고 여주인공을 구출하는 게임입니다.  
+**[시놉시스]**  
+몬스터들에게 납치당한 여주인공(Granada)이 흘린 소지품들의 흔적을 찾아  
+보스를 무찌르고 여주인공을 구출하는 게임입니다.  
 
 **게임 흐름도**  
 ![흐름도_그라나다](https://ji-hun-park.github.io/assets/images/Flowchart_Forthegranada.png "flowchart_granada"){: .align-center}
