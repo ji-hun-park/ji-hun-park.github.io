@@ -51,25 +51,18 @@ toc_label: "목차"
 **게임 흐름도**  
 ![흐름도_그라나다](https://ji-hun-park.github.io/assets/images/Flowchart_Forthegranada.png "flowchart_granada"){: .align-center}
 
-<!--
-![그림35](https://ji-hun-park.github.io/assets/images/pofol035.png "그림35"){: .align-center}
-
-**보스 패턴 흐름도**  
-![그림36](https://ji-hun-park.github.io/assets/images/pofol036.png "그림36"){: .align-center}
-![그림37](https://ji-hun-park.github.io/assets/images/pofol037.png "그림37"){: .align-center}
--->
-
 ### 플레이 방식
 
-<!--
-<details>
-<summary>클릭해서 펼치기 / 접기</summary>
-<div markdown="1">
--->
-
+**메인 스테이지**
 ![그림08](https://ji-hun-park.github.io/assets/images/pofol008.png "그림08"){: .align-center}
+
+**랜덤 맵 생성**
 ![그림13](https://ji-hun-park.github.io/assets/images/pofol013.png "그림13"){: .align-center}
+
+**일시 정지 메뉴**
 ![그림11](https://ji-hun-park.github.io/assets/images/pofol011.png "그림11"){: .align-center}
+
+**음량 조절**
 ![그림12](https://ji-hun-park.github.io/assets/images/pofol012.png "그림12"){: .align-center}
 
 * 메인 화면에서 게임시작 버튼을 누르면 난이도 선택 창이 나타나며, 쉬움, 보통, 도전 중 하나를 선택하면 스테이지에 진입합니다.  
@@ -78,13 +71,17 @@ toc_label: "목차"
 * 몬스터는 부채꼴 모양의 시야각으로 플레이어를 인식하며, 장애물 뒤에 숨으면 인식을 못 합니다.  
 * 플레이어의 체력이 0이 되거나 제한 시간을 초과하면 게임 오버입니다.
 
+**미니 게임**
 ![그림09](https://ji-hun-park.github.io/assets/images/pofol009.png "그림09"){: .align-center}
+
+**아이템 획득**
 ![그림10](https://ji-hun-park.github.io/assets/images/pofol010.png "그림10"){: .align-center}
 
 보물 상자와 상호작용을 하면 미니게임 퀴즈가 나타나며, 정답을 맞춰 아이템이나 열쇠 조각을 얻을 수 있습니다.  
 제한 시간 내에 모든 열쇠조각을 모아 소지품 상자를 열면 스테이지 클리어입니다.  
 3개의 일반 스테이지를 모두 클리어하면 보스 스테이지에 진입합니다.
 
+**보스 스테이지**
 ![그림14](https://ji-hun-park.github.io/assets/images/pofol014.png "그림14"){: .align-center}
 
 보스에게 직접 공격은 불가하며, 점프와 대쉬 2가지의 패턴을 랜덤으로 반복합니다.  
@@ -92,18 +89,15 @@ toc_label: "목차"
 보스의 대쉬는 방향 예고 후 플레이어를 향하므로 방향을 유도해야 합니다.  
 점프는 일정시간 사라졌다가 플레이어를 중심으로 다시 나타난 후 원형 범위에 데미지를 가합니다.  
 
+**2페이즈 불길 생성**
 ![그림15](https://ji-hun-park.github.io/assets/images/pofol015.png "그림15"){: .align-center}
 
 보스의 HP가 절반 이하가 되면 페이즈2에 돌입해 위치를 미리 알려준 뒤, 맵 상에 불길이 나타납니다.  
 
+**엔딩 씬**
 ![그림40](https://ji-hun-park.github.io/assets/images/pofol040.jpg "그림40"){: .align-center}
 
 보스의 HP가 0이 되면 엔딩 컷씬이 나오면서 게임 클리어입니다.  
-
-<!--
-</div>
-</details>
--->
 
 ### Assets Used
 2D 픽셀 아트 캐릭터 및 장식물 에셋, 음향 에셋, UI 에셋, 생성형 AI 이미지 등을 사용했습니다.  
@@ -143,12 +137,6 @@ URL, JSON이 이상했는데 이를 검색을 통해 수정했습니다.
 무료 플랫폼의 경우 계정 당 하루 6종류 제한이라 다른 팀원들의 도움을 적극적으로 요청했습니다.  
 최대한 필요할 것 같은 기능들을 전달하고, 이를 적극적으로 만들었고, 가장 많은 커밋을 했습니다.  
 게임 플레이를 직접하면서 경험을 전달하고 수치를 협의 후 조절하는 등으로 적극적으로 임하였습니다.  
-
-<!--
-**커밋들**  
-![그림38](https://ji-hun-park.github.io/assets/images/pofol038.png "그림38"){: .align-center}
-![그림39](https://ji-hun-park.github.io/assets/images/pofol039.png "그림39"){: .align-center}
--->
 
 ### 주요 담당 역할 (Contribution)
 팀원 중 가장 많은 종류의 역할(40% 이상의 기여도)을 수행했습니다.  
@@ -238,8 +226,3 @@ Before: 모든 기능이 게임 매니저 안에 들어가서 게임 매니저�
 After: 각 기능 별로 별도의 매니저로 나누어 함수들을 분리했습니다.
 
 그 밖에도 중복되는 부분을 하나의 함수로 묶거나, 변수를 읽기 전용으로 제한하거나 상수로 바꾸거나, Update 문의 호출을 event등을 이용해 줄이는 시도를 했습니다.
-
-<!--
-</div>
-</details>
--->
