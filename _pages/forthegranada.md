@@ -11,40 +11,35 @@ toc_label: "목차"
 
 ![움그00](https://ji-hun-park.github.io/assets/images/ftgplay.gif "움그00"){: .align-center}
 
-## Links
+## 0. Links
 📥**Download:** [ForTheGranada GoogleDrive](https://drive.google.com/drive/folders/1O5f4WLxdKuyVzdOm2uxCYTrPCpUg5eTf?usp=sharing)  
 🎬**Game Introduction Video:** [ForTheGranada Youtube](https://www.youtube.com/watch?v=3aYrso13pHI)  
 💻**Github:** [ForTheGranada Personal](https://github.com/ji-hun-park/ForTheGranada)  
 >원본 팀 프로젝트는 Private이며, 리팩토링 코드는 본 링크에서 확인 가능합니다.  
 
-## Documents
-상세요구사항명세서: [상세요구사항명세서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%83%81%EC%84%B8%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C_002_GameinhAi.pdf)  
-상세설계서: [상세설계서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%83%81%EC%84%B8%EC%84%A4%EA%B3%84%EC%84%9C_002_GameinhAi.pdf)  
-최종보고서: [최종보고서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%B5%9C%EC%A2%85%EB%B3%B4%EA%B3%A0%EC%84%9C_GameinhAi.docx)
+### Documents
+📋**상세요구사항명세서:** [상세요구사항명세서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%83%81%EC%84%B8%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C_002_GameinhAi.pdf)  
+📋**상세설계서:** [상세설계서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%83%81%EC%84%B8%EC%84%A4%EA%B3%84%EC%84%9C_002_GameinhAi.pdf)  
+📋**최종보고서:** [최종보고서](https://github.com/ji-hun-park/ForTheGranada/blob/main/%EC%B5%9C%EC%A2%85%EB%B3%B4%EA%B3%A0%EC%84%9C_GameinhAi.docx)
 
-## 프로젝트 개요
+## 1. 프로젝트 개요
 **생성형 AI(Gemini API)를 활용한 실시간 퀴즈 생성 시스템이 도입된 2D 탑뷰 어드벤처 게임**으로  
 대학교 종합설계(캡스톤)에서 졸업과제로 제작한 개발자 3인으로 구성된 팀프로젝트입니다.
 
-### 장르
-2D Top-View Adventure
+### 📋프로젝트 정보
 
-### 개발 인원
-개발자 3인(팀원, 클라이언트 개발 등, 개인 기여도 40% 이상)
-
-### 제작 기간
-2024.8 ~ 2024.12 사전 기획 포함 약 4개월 소요  
-2025.1 ~ 2025.2 개인 리팩토링 1개월
-
-### 개발 환경
-Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
+* **장르 / 플랫폼:** 2D Top-View Adventure / PC (Single)
+* **개발 인원:** 3인 개발(개발자 3인(팀장 1, 팀원 2), 클라이언트 및 시스템 담당, 개인 기여도 40% 이상)
+* **제작 기간:** 2024.8 ~ 2024.12 사전 기획 포함 약 4개월 소요
+    * 2025.1 ~ 2025.2 개인 리팩토링 1개월
+* **사용 엔진 / 언어 / 환경:** Unity6 (6000.0.32f1) / C# / VSCode(본인) & Visual Studio 2022(팀원들)
 
 ### 핵심 역할
 * Google Gemini API 연동 및 비동기 통신 구현
 * FSM 기반 보스 AI 및 패턴 설계
 * 전체 게임 매니지먼트 및 데이터 구조 설계
 
-## 게임 소개
+## 2. 게임 소개
 **Unity 2D Top View Adventure Game**  
 
 **Core Loop:** 탐험(몬스터 회피) -> 열쇠 조각 수집(퀴즈) -> 보스전 -> 엔딩
@@ -125,7 +120,7 @@ Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
 **충돌로 인해 깨진 씬**  
 ![그림16](https://ji-hun-park.github.io/assets/images/pofol016.png "그림16"){: .align-center}
 
-## 해결 과정
+## 3. 해결 과정
 소통 문제 해결을 위해 주 1회 이상 디스코드 통화를 통해 회의를 진행하고, 수시로 카카오톡을 통해 의견을 나눴습니다.  
 회의마다 각 요소에 대한 의견을 내서 대화를 통해 하나로 수렴했습니다.  
 인코딩 충돌로 한글이 깨지는 문제 해결을 위해 인코딩을 통일했습니다.  
@@ -133,7 +128,7 @@ Unity6 (6000.0.32f1), C#, Visual Studio 2022, VSCode
 동일한 씬을 여러 사람이 수정하는 것을 최대한 줄이기 위해 작업 영역을 분리하고, 프리팹을 활용하거나,  
 각자 따로 백업하고 자주 Git push와 pull을 하고 PR을 날리는 등의 조치를 취했습니다.
 
-## 개인 활약
+## 4. 개인 활약
 ### 핵심
 일부 몰랐던 기능이 존재했고, 이를 LLM과 구글링을 통해 해결하였습니다.  
 특히 Unity에서 LLM API를 활용하는 기술은 최신 기술이기에 낯설었지만,  
@@ -217,7 +212,7 @@ Resoruces 디렉터리에서 파일명에 해당하는 Texture2D를 가져와 �
 모든 UI와 관련된 기능, 디자인을 구현했습니다.  
 에셋을 활용하거나, 생성형 AI로 생성해 원본 혹은 일부 편집하여 사용했으며, 그림판3D로 직접 제작한 부분도 있습니다.
 
-## 코드 개선(Refactoring & Optimization)
+## 5. 코드 개선(Refactoring & Optimization)
 모든 프로젝트가 종료되고, 무사히 발표를 마친 후,  
 저는 개인적으로 추가 공부를 하면서 기존의 저의 코드가 미흡했다는 것을 깨닫고,  
 개인 프로젝트를 만들어 리팩토링을 진행했습니다.
