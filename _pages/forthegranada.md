@@ -207,22 +207,22 @@ Resoruces 디렉터리에서 파일명에 해당하는 Texture2D를 가져와 �
 
 ![그림28](https://ji-hun-park.github.io/assets/images/pofol028.png "그림28"){: .align-center}
 
-Before: 비활성된 UI 오브젝트를 찾을 수 없어 씬에서 전부 활성화시켜놔서 수정할 때마다 번거로웠습니다.  
-After: 자식 오브젝트들을 재귀적으로 찾는 함수를 만들어 비활성화된 자식들도 찾을 수 있게 만들었습니다.
+**Before:** 비활성된 UI 오브젝트를 찾을 수 없어 씬에서 전부 활성화시켜놔서 수정할 때마다 번거로웠습니다.  
+**After:** 자식 오브젝트들을 재귀적으로 찾는 함수를 만들어 비활성화된 자식들도 찾을 수 있게 만들었습니다.
 
 ![그림32](https://ji-hun-park.github.io/assets/images/pofol032.png "그림32"){: .align-center}
 
-Before: 모든 UI 오브젝트들을 GameObject의 FIND로 찾아 비효율적이었습니다.  
-After: canvas의 Transform의 Find로 찾을 수 있게 되었습니다.
+**Before:** 모든 UI 오브젝트들을 GameObject의 FIND로 찾아 비효율적이었습니다.  
+**After:** canvas의 Transform의 Find로 찾을 수 있게 되었습니다.
 
 ![그림29](https://ji-hun-park.github.io/assets/images/pofol029.png "그림29"){: .align-center}
 
-Before: 모든 스크립트가 Scripts 폴더 하나에 전부 모여있어서 찾기 어려웠습니다.  
-After: 하위 폴더를 만들어 분류했습니다.
+**Before:** 모든 스크립트가 Scripts 폴더 하나에 전부 모여있어서 찾기 어려웠습니다.  
+**After:** 하위 폴더를 만들어 분류했습니다.
 
 ![그림30](https://ji-hun-park.github.io/assets/images/pofol030.png "그림30"){: .align-center}
 
-Before: 모든 기능이 게임 매니저 안에 들어가서 게임 매니저가 1000줄이 넘어가 특정 부분 찾기가 어려웠습니다.  
-After: 각 기능 별로 별도의 매니저로 나누어 함수들을 분리했습니다.
+**Before:** 모든 기능이 게임 매니저 안에 들어가서 게임 매니저가 1000줄이 넘어가 특정 부분 찾기가 어려웠습니다.  
+**After:** 각 기능 별로 별도의 매니저로 나누어 함수들을 분리했습니다.
 
 그 밖에도 중복되는 부분을 하나의 함수로 묶거나, 변수를 읽기 전용으로 제한하거나 상수로 바꾸거나, Update 문의 호출을 event등을 이용해 줄이는 시도를 했습니다.
