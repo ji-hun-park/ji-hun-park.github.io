@@ -22,6 +22,8 @@ toc_label: "목차"
 * **사용 엔진 / 언어 / 환경:** Unity6 (6000.0.32f1) / C# / VSCode
 
 ## 2. 게임 소개
+![그림00](https://ji-hun-park.github.io/assets/images/thingpuzzle.png "그림00"){: .align-center}
+
 **Unity 2D Mobile Puzzle Game**  
 8X8의 보드에서 4칸짜리 다양한 모양의 블록을 옮겨 한 라인을 채워 없애는 퍼즐 게임입니다.
 
