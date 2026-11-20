@@ -205,4 +205,4 @@ __forceinline bool CompareSortKeySIMD(const SortKey& a, const SortKey& b) noexce
 2. **데이터 규격을 하드웨어 레지스터 폭(128-bit)에 맞추면 분기가 사라진다:**  
    정렬 키를 정확히 128비트(16바이트)로 정렬(`alignas(16)`)해 설계한 덕분에, 복잡한 다중 조건문을 단 몇 줄의 SSE2 SIMD 명령어와 비트 마스크 비교 하나로 치환할 수 있었습니다.
 
-[⬅️ 메인 프로젝트(Endfield-Vulkan-Renderer) 아키텍처 포스트로 돌아가기](https://ji-hun-park.github.io/MyEndfield){: .btn .btn--primary}
+[⬅️ 메인 프로젝트(Endfield-Vulkan-Renderer) 아키텍처 포스트로 돌아가기](https://ji-hun-park.github.io/myendfield){: .btn .btn--primary}
