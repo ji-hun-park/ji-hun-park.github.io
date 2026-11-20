@@ -93,6 +93,13 @@ flowchart LR
     end
 </pre>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  if (typeof mermaid !== 'undefined') {
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  }
+</script>
+
 1. **과도한 메모리 트래픽:** 기수 정렬은 1패스마다 ① 히스토그램 카운팅을 위한 전체 읽기(1회)와 ② 계산된 오프셋 위치로 실제 16바이트 데이터를 옮겨 적는 핑퐁 읽기·쓰기(2회)를 수행합니다. 이를 16패스 반복하면 60,000개 배열을 총 **32회 이상 순회**하며 수십 MB의 메모리 읽기·쓰기 트래픽을 발생시킵니다.
 2. **256개 버킷 분산 쓰기(Scatter Write)로 인한 캐시 미스:** 데이터를 0~255번 바구니 위치로 흩뿌려 적을 때 서로 멀리 떨어진 최대 256개의 메모리 주소를 불규칙하게 오가며 쓰기 작업이 일어납니다. 이는 CPU의 64바이트 캐시 라인 적중률을 크게 떨어뜨리고 TLB 미스를 유발합니다.
 
