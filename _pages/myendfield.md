@@ -132,15 +132,20 @@ CompileGraph() 호출 시 컴파일 타임에 접근 마스크를 모아서
 하나의 파이프라인 배리어 그룹(MergedBarrierGroup)으로 병합하는 구조를 구현했습니다.
 
 5. 테스트 및 벤치마크
+
 ![그림05](https://ji-hun-park.github.io/assets/images/엔드필드005.png "그림05"){: .align-center}
+
 그 밖에 여러 예외 처리나 검증을 위해 Google Test를 통해 단위 테스트도 진행을 했습니다.
 
 ![그림06](https://ji-hun-park.github.io/assets/images/엔드필드006.png "그림06"){: .align-center}
+
 최종적으로 스포너를 통해 10,000 개의 FBX(각 서브 메쉬 19개로 구성)를 스폰해 프레임 안정적으로 렌더링하는데 성공했습니다.  
 이는 총 19만 개의 메시와 폴리곤(삼각형) 약 21억 개, 정점 약 18억 개로 이루어져 있습니다.
 
 ![그림07](https://ji-hun-park.github.io/assets/images/엔드필드007.png "그림07"){: .align-center}
+
 ![그림08](https://ji-hun-park.github.io/assets/images/엔드필드008.png "그림08"){: .align-center}
+
 또한 성능 비교를 위해 현재 버전과 Unity DOTS, Burst, Job 시스템을 이용하고  
 유니티에서 자체 지원하는 Vulkan API를 이용하는 버전과 그냥 OOP 및 URP와 GPU Instancing을 사용하는 버전을  
 준비해 자체 벤치마크도 진행했습니다.  
