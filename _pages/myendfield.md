@@ -36,9 +36,10 @@ Unite Seoul 2026에서 들은 HyperGryph의 Tech Lead이신 Will Fei님의 강�
 * **사용 엔진 / 언어 / 환경:** Unity6.6 (6000.6.9f1) / C#, C++(Vulkan) / VSCode, agy
 
 ## 2. 게임 소개
-**Unity 자체 ECS와 별도 자체 파이프라인**  
+**[Unity 자체 ECS와 별도 자체 파이프라인]**  
 오브젝트들이 자체 ECS를 통해 관리됩니다.  
-Unity Editor에서 모델의 정보를 가져와 DLL 플러그인과 Native Render Feature를 이용해 렌더 루프를 가로채 별도의 Window에서 실행하게 했습니다.  
+Unity Editor에서 모델의 정보를 가져와 DLL 플러그인과 Native Render Feature를 이용해  
+렌더 루프를 가로채 별도의 Window에서 실행하게 했습니다.  
 독자적인 Vulkan 기반 렌더 파이프라인을 통해 렌더링됩니다.  
 대규모 고밀도 모델 이동 시에도 프레임이 안정적으로 유지됩니다.
 
@@ -53,6 +54,7 @@ Unity Editor에서 모델의 정보를 가져와 DLL 플러그인과 Native Rend
 ## 4. 핵심 구현 내용
 1. 렌더링 아키텍처 코어 (C++ Native Pipeline)
 - 주요 규칙은 고수준 API 의존 탈피 및 네이티브 C++ 파이프라인 통제로 C++에서 온전히 루프를 소유해야 한다입니다.
+
 Unity 엔진은 보통 윈도우의 Directx11에서 구동이 됩니다.  
 이를 Vulkan으로 전환하는 기능과 이를 위한 인터페이스들이 존재하지만  
 저는 자체적으로 개발했습니다.
@@ -64,7 +66,8 @@ Unity 엔진은 보통 윈도우의 Directx11에서 구동이 됩니다.
 DLL Plugin을 통해 제가 자체 제작한 Custum Vulkan이 탑재된  
 C++코드로 구동하도록 중간에 가로챈 뒤  
 PC_Render에 Native Render Feature를 추가해  
-별도의 Windows 창을 띄워 그 곳에서 렌더링되도록 변경했습니다.  
+별도의 Windows 창을 띄워 그 곳에서 렌더링되도록 변경했습니다.
+
 그리고 현재 Unity 엔진에선 Entity 정보,  
 Component(위치)와 Mesh 정보를 제공하는 기능만 수행하게 했습니다.  
 이를 통해 Unity에서 주로 쓰이는 언어인 C#의 관리형 언어의  
@@ -76,6 +79,7 @@ Unity Editor에 알려준 뒤 콘솔에 출력하도록 설계했습니다.
 
 2. 커스텀 ECS 및 데이터 지향 설계(Data-Oriented Design)
 - 주요 규칙은 자체 ECS 구축, 128-bit 고정 마스크 사용, SoA Chunk Memory 사용, 포인터 체이싱 배제하기입니다.
+
 Unity에선 이미 자체적으로 ECS를 지원하기 위한 DOTS 패키지가 있습니다.  
 또한 Burst Compiler와 Job System을 통해  
 CPU SIMD 최적화를 구현하기 쉽도록 기능을 제공합니다.
@@ -94,6 +98,7 @@ QueryChunks 내부에서 mask.Contains() 함수를 통해
 
 3. 멀티스레딩 및 컬링
 - 주요 규칙은 Lock-Free 병렬화, 타일 기반 래스터라이즈, 단일 컬링 패스로
+
 Culling.cpp에서 RasterizeTilesParallel 함수는 화면을 8개의 타일로 쪼개고, 4개의 워커 스레드가 각자 타일을 맡도록 구현했습니다.  
 이 때 오브젝트 역시 8개로 쪼갠 뒤 각자 자신이 맡은 구역에 존재하는 오브젝트 조각만 작업을 담당하게 했습니다.  
 이렇게 하면 서로가 자원을 공유할 일이 전혀 없기 때문에 Lock이나 Mutex 등이 필요없어집니다.  
@@ -101,6 +106,7 @@ Culling.cpp에서 RasterizeTilesParallel 함수는 화면을 8개의 타일로 �
 
 4. 그래픽스 리소스 관리 및 배리어 최적화
 - 주요 규칙은 64-bit 단일 정렬 키, Dynamic Offset, 배리어 병합(Render Graph)입니다.
+
 우선 Sort Key를 구현해서 uint64_t union을 활용해 총 64비트를  
 passID(16비트) -> pipelineID(16비트) -> materialID(16비트) -> depth(16비트) 의 구조로  
 순서대로 나누어서 하나의 키에 4가지를 한꺼번에 집어넣었습니다.  
