@@ -9,22 +9,23 @@ toc_label: "목차"
 
 **"Vulkan 기반 자체 렌더 파이프라인 엔진"**
 
-![움그00](https://ji-hun-park.github.io/assets/images/canvas.gif "움그00"){: .align-center}
+![그림01](https://ji-hun-park.github.io/assets/images/엔드필드001.png "그림01"){: .align-center}
+![그림02](https://ji-hun-park.github.io/assets/images/엔드필드002.png "그림02"){: .align-center}
 
 ## 0. Links
-📥**Download:** [WhatIsAVaccine GoogleDrive](https://drive.google.com/file/d/1UxYPVTVv3ubTJkSkJFCheksu-1MviBIz/view?usp=sharing)  
-🎬**Play Video:** [WhatIsAVaccine Play Video](https://youtu.be/HhLgUsnNSzc)  
-💻**Github:** [WhatIsAVaccine Github](https://github.com/ji-hun-park/Weru_GameJam_R1)  
+📥**Download:** []()  
+🎬**Explanation Video:** [Project Explanation Video](https://youtu.be/ycOyzvgSdMk?si=GY3JUIKaq-qP8HgB)  
+💻**Github:** [MyEndfield Github](https://github.com/ji-hun-park/MyEndfield)  
 
 ## 1. 프로젝트 개요
-> LLM(대형 언어 모델) API를 활용하여, 플레이어의 행동(질문, 그림 그리기)이 게임 진행에 직접적인 영향을 미치는 **3D 추리 서바이벌 게임**입니다.  
-> 기존의 정해진 스크립트 방식에서 벗어나, AI가 상황을 분석하고 동적으로 힌트를 제공하는 시스템을 구현하는 데 중점을 두었습니다.
+> <명일방주: 엔드필드>의 ECS 및 렌더링 파이프라인을 모방한 **세미 엔진 프로젝트**입니다.  
+> 상용 엔진의 파이프라인이 아닌 독자적인 파이프라인을 통해 렌더링 과정을 최적화하는 연습을 했습니다.
 
-게임잼에 참여해 촉박한 기간 안에 기존에 개인적으로 연습했던  
-프로젝트의 기능 들을 통합해보는 경험을 해봤습니다.
+Unite Seoul 2026에서 들은 HyperGryph의 Tech Lead이신 Will Fei님의 강연 내용을 토대로  
+실제 명일방주: 엔드필드의 파이프라인 구조를 모방해보는 경험을 해봤습니다.
 
 **시스템 흐름도**  
-![시스템 흐름도](https://ji-hun-park.github.io/assets/images/Game_Loop_with_API.png "Game Logic Flow"){: .align-center}
+![시스템 흐름도](https://ji-hun-park.github.io/assets/images/엔드필드000.png "Game Logic Flow"){: .align-center}
 
 ### 📋프로젝트 정보
 
