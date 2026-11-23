@@ -52,7 +52,7 @@ Unity Editor에서 모델의 정보를 가져와 DLL 플러그인과 Native Rend
 테스트용으로 10,000개의 모델들이 스폰된 후 각자 위아래로 반복 이동합니다.
 
 ## 4. 핵심 구현 내용
-1. 렌더링 아키텍처 코어 (C++ Native Pipeline)
+1.렌더링 아키텍처 코어 (C++ Native Pipeline)
 - 주요 규칙은 고수준 API 의존 탈피 및 네이티브 C++ 파이프라인 통제로 C++에서 온전히 루프를 소유해야 한다입니다.
 
 Unity 엔진은 보통 윈도우의 Directx11에서 구동이 됩니다.  
@@ -77,7 +77,7 @@ Component(위치)와 Mesh 정보를 제공하는 기능만 수행하게 했습�
 C++에서 콜백 함수를 통해 Plugin을 거쳐  
 Unity Editor에 알려준 뒤 콘솔에 출력하도록 설계했습니다.
 
-2. 커스텀 ECS 및 데이터 지향 설계(Data-Oriented Design)
+2.커스텀 ECS 및 데이터 지향 설계(Data-Oriented Design)
 - 주요 규칙은 자체 ECS 구축, 128-bit 고정 마스크 사용, SoA Chunk Memory 사용, 포인터 체이싱 배제하기입니다.
 
 Unity에선 이미 자체적으로 ECS를 지원하기 위한 DOTS 패키지가 있습니다.  
@@ -96,7 +96,7 @@ QueryChunks 내부에서 mask.Contains() 함수를 통해
 삭제 시 Swap-and-Pop을 통해 메모리 단편화를 방지하고 O(1) time에 처리하는 것을 보장하게 했습니다.  
 또한 극단적인 캐시 최적화를 위해 엔티티 핸들자체(8-byte)에 인덱스를 버저닝하여 맵 조회를 없앴습니다.
 
-3. 멀티스레딩 및 컬링
+3.멀티스레딩 및 컬링
 - 주요 규칙은 Lock-Free 병렬화, 타일 기반 래스터라이즈, 단일 컬링 패스로
 
 Culling.cpp에서 RasterizeTilesParallel 함수는 화면을 8개의 타일로 쪼개고, 4개의 워커 스레드가 각자 타일을 맡도록 구현했습니다.  
@@ -104,15 +104,15 @@ Culling.cpp에서 RasterizeTilesParallel 함수는 화면을 8개의 타일로 �
 이렇게 하면 서로가 자원을 공유할 일이 전혀 없기 때문에 Lock이나 Mutex 등이 필요없어집니다.  
 그렇기에 Lock-Free 구현을 통해 쓸데없는 Hanging이 사라진 상태로 4개의 워커 스레드가 동시에 작업을 진행하기 때문에 굉장히 빠른 컬링을 수행합니다.
 
-4. 그래픽스 리소스 관리 및 배리어 최적화
+4.그래픽스 리소스 관리 및 배리어 최적화
 - 주요 규칙은 64-bit 단일 정렬 키, Dynamic Offset, 배리어 병합(Render Graph)입니다.
 
 우선 Sort Key를 구현해서 uint64_t union을 활용해 총 64비트를  
 passID(16비트) -> pipelineID(16비트) -> materialID(16비트) -> depth(16비트) 의 구조로  
 순서대로 나누어서 하나의 키에 4가지를 한꺼번에 집어넣었습니다.  
 Key를 이런 구조로 구성한다면 std::sort 만으로도 배칭 정렬이 완료되어 효율적입니다.  
-아래는 이에 대한 상세한 설명이 담긴 게시글입니다.  
-[DeepLink](https://ji-hun-park.github.io/myendfield/simd-sortkey-vs-radix-sort/)
+아래는 기수 정렬과 비교한 상세한 설명이 담긴 게시글입니다.  
+**Radix Sort VS std::sort** [DeepLink](https://ji-hun-park.github.io/myendfield/simd-sortkey-vs-radix-sort/)
 
 다음으로 동적 오프셋 할당을 위해 VulkanBackend.cpp의 디스크립터 레이아웃을  
 0번 - 패스당 1회 (라이팅 / 카메라 / 그림자)  
@@ -131,7 +131,7 @@ RenderGraph.h / .cpp에서 각 패스의 자원 사용을 AccessTag로 선언하
 CompileGraph() 호출 시 컴파일 타임에 접근 마스크를 모아서  
 하나의 파이프라인 배리어 그룹(MergedBarrierGroup)으로 병합하는 구조를 구현했습니다.
 
-5. 테스트 및 벤치마크
+5.테스트 및 벤치마크
 
 ![그림05](https://ji-hun-park.github.io/assets/images/엔드필드005.png "그림05"){: .align-center}
 
